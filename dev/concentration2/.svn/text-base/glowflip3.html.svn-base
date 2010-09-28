@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"> 
+ 
+<head> 
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script> 
+ 
+	<style type="text/css"> 
+		.panel {
+			float: left;
+			position: relative;
+			-webkit-perspective: 700;
+		}
+
+		.panel .front {
+			float: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 900;
+			border: 1px solid #ccc;
+			background: #777;
+			text-align: center;
+			
+			-webkit-transform-style: preserve-3d;
+			-webkit-backface-visibility: hidden;
+ 
+			transition: all .4s ease-in-out;
+			-moz-transition: all .4s ease-in-out;
+			-webkit-transition: all .4s ease-in-out;
+		}
+
+		.panel.flip .front {
+			z-index: 900;
+			border-color: #eee;
+			-webkit-transform: rotateY(180deg);
+		}
+		
+		.panel .back {
+			float: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 800;
+			border: 1px solid #ccc;
+			background: #888;
+			
+			-webkit-transform: rotateY(-180deg);
+			-webkit-transform-style: preserve-3d;
+			-webkit-backface-visibility: hidden;
+ 
+			transition: all .4s ease-in-out;
+			-moz-transition: all .4s ease-in-out;
+			-webkit-transition: all .4s ease-in-out;
+		}
+		
+		.panel.flip .back {
+			z-index: 1000;
+			-webkit-transform: rotateY(0deg);
+		}
+		
+		.panel.flip .action {display: none; }
+
+		.panel:hover {
+			-moz-box-shadow: 0px 0px 10px #000000;
+			-webkit-box-shadow: 0px 0px 10px #000000;
+			box-shadow: 0px 0px 10px #000000;
+		}
+	</style> 
+	
+	<script type="text/javascript"> 
+		$(document).ready(function(){
+
+			$('.click').toggle(function(){
+				$(this).addClass('flip');
+			},function(){
+				$(this).removeClass('flip');
+			});
+			
+		});
+	</script> 
+</head> 
+ 
+<body> 
+ 
+	<div class="click panel">
+		<div class="front"><img class='card' src='back.png' /></div>
+		<div class="back"><img class='card' src='ace.png' /></div>
+	</div>
+
+ 
+</body> 
+</html> 

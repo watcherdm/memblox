@@ -1,0 +1,15 @@
+CACHE MANIFEST
+#version01
+
+#files that explicitly cached
+CACHE:
+index.html
+about.html
+mc.css
+jquery.min.js
+mc.js
+mute.svg
+muteon.svg
+shapes.svg
+notmatch.mp3
+match.mp3

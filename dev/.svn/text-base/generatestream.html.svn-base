@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta name="generator" content="PSPad editor, www.pspad.com">
+  <title></title>
+<script type="text/javascript">
+	var stream = [4, 6, 8];
+
+	// Builds a stream of values.
+	//
+	// deck array - an array of values to pick from.
+	// minBuffer - the min number of places that separate pairs.
+	// maxBuffer - the max number of places that separate pairs.
+	// maxStream - the number of values to be in the returned stream (must be a multiple of 2!)
+	//
+	// return array - the stream of values with length maxStream.
+	function makeStream(deck, minBuffer, maxBuffer, maxStream)
+	{
+		// The array to be returned with stream.
+		var values = [];
+
+		var size = deck.length;
+
+		// Values that are on the board that still await matches.
+		var buffer = [];
+
+		for(var i = 0; i < maxStream; i++)
+		{
+			var useBuffer = Math.round(Math.random());
+
+			// If we have enough numbers, empty buffer and we're finished.
+			if(buffer.length+values.length == maxStream)
+			{
+				while(buffer.length > 0)
+				{
+					var nextNumber = buffer.splice(Math.floor(Math.random()*buffer.length), 1);
+					values.push(nextNumber);
+				}
+
+				return values;
+			}
+
+			if(buffer.length >= maxBuffer || (useBuffer == 1 && buffer.length >= minBuffer))
+			{
+				// If we max the buffer or we randomly choose to, take a buffer value.
+				var nextNumber = buffer.splice(Math.floor(Math.random()*buffer.length), 1);
+				values.push(nextNumber);
+			}
+			else
+			{
+				// Pick a random value from the deck.  Add it to the buffer for its match.
+				var nextNumber = deck[Math.floor(Math.random()*deck.length)];
+				values.push(nextNumber);
+				buffer.push(nextNumber);
+			}
+		}
+
+		return values;
+	}
+
+	// Returns the next item in the stream.
+	function getNextItem()
+	{
+		return stream.shift();
+	}
+
+	function testMakeStream()
+	{
+		stream = makeStream([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3, 10, 20);
+		alert(stream);
+	}
+	
+</script>
+  </head>
+  <body>
+	<input type="button" onclick="testMakeStream();" value="Make new stream" />
+  </body>
+</html>

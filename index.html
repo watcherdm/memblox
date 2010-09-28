@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" manifest="mc.manifest">
+<head>
+  <meta charset="utf-8"/>
+  <title>GTUG Campout :: Memory Card</title>
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <link rel="shortcut icon" href="/appleicon.png"/>
+  <link rel="apple-touch-icon" href="/appleicon.png"/> 
+  <link rel="apple-touch-startup-image" href="startup.png" />
+  <link rel="stylesheet" href="mc.css"/>  
+</head> 
+<body>
+  <article>
+    <header>
+      Header Content
+    </header>
+    <section id="main">
+      <audio id="nonmatchsound" preload src="notmatch.mp3"></audio>
+      <audio id="matchsound" preload src="match.mp3"></audio>
+      <audio id="gameoversound" preload src="gameover.mp3"></audio>
+      <div id="tetris"> 
+      <!-- <div id="board" style="float: right; border: 1px solid black;">Board<br /></div> --> 
+          <div class="game_area"> 
+              <div id="canvas"></div> 
+          </div> 
+          <div id="info">
+              <p id="time">Time: <span></span></p> 
+          </div> 
+          <div id="controls" class="show_controls">
+            <div class="control move_left">Left</div> 
+            <div class="control move_right">Right</div>
+            <ul>
+               <li id="level">Level: <span></span></li>
+                <button id="mutebutton" value="Mute"></button>
+               <li id="score">Score: <span></span></li>
+            </ul>
+            <!-- <div class="control move_pause"><div class="move_pause"><span>Pause</span></div></div>  -->
+          </div>
+      </div> 
+      
+    </section><!-- main -->
+    <footer>
+
+    </footer>
+  </article>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+  <script>!window.jQuery && document.write('<script src="js/jquery-1.4.2.min.js"><\/script>')</script>
+  <script src="mc.js"></script>
+</body>
+</html>

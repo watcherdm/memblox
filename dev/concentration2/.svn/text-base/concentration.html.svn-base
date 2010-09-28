@@ -1,0 +1,13 @@
+<!DOCTYPE html "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml">
+	<HEAD>
+		<meta http-equiv = "content-type" content = "text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="concentration.css" />
+	</HEAD>
+	<BODY>
+       
+		<SCRIPT type="text/javascript" src="jquery-1.4.2.min.js"></script>
+		<SCRIPT type="text/javascript" src="concentration.js"></script>
+        <SCRIPT type="text/javascript">$(document).ready(oninitial);</script>
+    </BODY>
+</HTML>

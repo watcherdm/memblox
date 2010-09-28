@@ -1,0 +1,122 @@
+/* This is your special CSS file Dumbass::feel free to remove comments..  cuz they suck. :D  */
+/*
+Copyright (c) 2010, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.com/yui/license.html
+version:3.1.1  
+build:47
+*/
+html{color:#000; background:#FFF}
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, textarea, p, blockquote, th, td{margin:0; padding:0}
+table{border-collapse:collapse; border-spacing:0}
+fieldset, img{border:0}
+address, caption, cite, code, dfn, em, strong, th, var{font-style:normal; font-weight:normal}
+li{list-style:none}
+caption, th{text-align:left}
+h1, h2, h3, h4, h5, h6{font-size:100%; font-weight:normal}
+q:before, q:after{content:''}
+abbr, acronym{border:0; font-variant:normal}
+sup{vertical-align:text-top}
+sub{vertical-align:text-bottom}
+input, textarea, select{font-family:inherit; font-size:inherit; font-weight:inherit}
+input, textarea, select{*font-size:100%}
+legend{color:#000}
+
+/* TetrisMem */
+html{height:100%;background:#d7d7d7;overflow:hidden;}
+body{height:100%; background:#d7d7d7; margin:0; padding:0; font-family:Corbel,"Lucida Sans Unicode","Lucida Grade","Bitstream Vera Sans","Luxi Serif",Verdana,sans-serif}
+#tetris{width:320px; height:440px; background:#000; position:relative; margin:auto;margin-top:50px;}
+.roundme {-moz-border-radius:4px;border-radius:4px;}
+#canvas{position:absolute; color:#fff; height:400px; top:0; left:0; text-align:center}
+.game_area{width:320px}
+#canvas h1{
+	font-size:48px; 
+	position:relative; top:140px; 
+	background-color:#000; 
+	color:#000; 
+	-webkit-stroke-width:1.0px; 
+	-webkit-stroke-color:#333; 
+	-webkit-fill-color:#FFF; 
+	text-shadow:3px 3px 3px #fff;
+	width: 320px;
+	text-align: center;
+	}
+.piece{border:0px position:absolute}
+.square{position:absolute; width:40px; height:40px; }
+.square,
+.square div {-moz-border-radius:4px; border-radius:4px; -webkit-box-shadow:inset 0px 0px 5px rgba(255,255,255,0.4); -moz-box-shadow:inset 0px 0px 5px rgba(255,255,255,0.4); box-shadow:inset 0px 0px 5px rgba(255,255,255,0.4);}
+.type0{background-color:#9ED6D3}
+.type1{background-color:#F5CF94}
+.type2{background-color:#CCD2A4}
+.type3{background-color:#617192}
+.type4{background-color:#6B9798}
+.type5{background-color:#9BB5B2}
+.type6{background-color:#F89176}
+
+.flip .back {background-color:#F00; background-image: url(shapes.svg); -moz-background-clip: 40px 40px; -moz-background-size: 160px 160px;  -webkit-background-clip: 40px 40px;-webkit-background-size: 160px 160px;background-clip: 40px 40px; background-size: 160px 160px;}
+.flip[data-value="1"] .back {background-color:#F00; background-position: 0 0;}
+.flip[data-value="2"] .back {background-color:#0F0; background-position: 0 -40px;}
+.flip[data-value="3"] .back {background-color:#00F; background-position: 0 -80px;}
+.flip[data-value="4"] .back {background-color:#F0F; background-position: 0 -120px;}
+.flip[data-value="5"] .back {background-color:#FF0; background-position: -40px 0;}
+.flip[data-value="6"] .back {background-color:#0FF; background-position: -40px -40px;}
+.flip[data-value="7"] .back {background-color:#F60; background-position: -40px -80px;}
+.flip[data-value="8"] .back {background-color:#F06; background-position: -40px -120px;}
+.flip[data-value="9"] .back {background-color:#60F; background-position: -80px 0;}
+.flip[data-value="10"] .back {background-color:#06F; background-position: -80px -40px;}
+.flip[data-value="11"] .back {background-color:#F60; background-position: -80px -80px;}
+.flip[data-value="12"] .back {background-color:#06F; background-position: -80px -120px;}
+.flip[data-value="13"] .back {background-color:#909; background-position: -120px 0;}
+.flip[data-value="14"] .back {background-color:#303; background-position: -120px -40px;}
+.flip[data-value="15"] .back {background-color:#606; background-position: -120px -80px;}
+.flip[data-value="16"] .back {background-color:#60c; background-position: -120px -120px;}
+/* INFO:needs to be added and styled */
+#info{background-color:#000; color:#fff; width:100px; float:left; display:none}
+#level{padding-top:10px}
+.control{}
+.move_pause{top:360px; left:240px}
+.move_pause div, .move_show_controls div{color:#fff; text-align:center; font-size:150%}
+#controls{position:absolute; height:40px; background-color:rgba(0,0,0,1); width:320px; bottom:0; background-image:-webkit-gradient(linear,0% 0%,0% 50%,from(rgba(255,255,255,0.4)),to(rgba(255,255,255,0))); background-image:-moz-linear-gradient(0% 50% 90deg,rgba(255,255,255,0),rgba(255,255,255,0.3))}
+.move_left, .move_right{margin:4px 10px; color:#FFF; background-color:#666; text-decoration:none; background-image:-webkit-gradient(linear,top,bottom,from(#333),to(#666)); background-image:-moz-linear-gradient(top,#333,#666); text-shadow: 0 -1px 0 rgba(0,0,0,0.6); overflow:hidden; max-width:80px; white-space:nowrap; text-overflow:ellipsis; font-family:Helvetica; font-size:12px; font-weight:bold; -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; height:30px; line-height:30px; padding:0 10px;  -webkit-background-size:100% 50%;  -moz-background-size:100% 50%;  background-size:100% 50%;  background-repeat:no-repeat;  border:1px solid #2F353E;  -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.4); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4)}
+.move_left{float:left}
+.move_right{float:right}
+header, footer{display:none}
+
+/* Teh FlippingZZZZ  */
+.panel{ position:absolute;  -webkit-perspective:700}
+/* rotate*/
+.panel .front{float:none;  position:relative;  top:0;  left:0;  z-index:900; text-align:center;
+	  -webkit-transform-style:preserve-3d;  
+	  -webkit-backface-visibility:hidden;  
+	   transition: all .4s ease-in-out;  
+	  -moz-transition:all .4s ease-in-out;  
+	  -webkit-transition:all .4s ease-in-out;
+		width: 100%; height: 100%;}
+.panel.flip .front{z-index:900;  -webkit-transform:rotateY(180deg)}
+.panel .back{float:none;  position:absolute;  top:0;  left:0;  z-index:800; -webkit-transform:rotateY(-180deg);  -webkit-transform-style:preserve-3d;  -webkit-backface-visibility:hidden;  transition:all .4s ease-in-out;  -moz-transition:all .4s ease-in-out;  -webkit-transition:all .4s ease-in-out}
+/*@-webkit-keyframes 'opaque'{from{opacity:1} to {opacity:0} } */
+.fade{-webkit-animation:'opaque' 1s linear 0s 1;  opacity:0}
+.panel.flip .back{z-index:1000;  -webkit-transform:rotateY(0deg);	width: 100%; height: 100%}
+.panel.flip .action{display:none}
+.front:hover, .back:hover{
+	outline: 1px solid rgba(255,255,255,0);
+	-moz-box-shadow: 
+	inset 3px 3px 3px rgba(0,0,0,0.4); 
+	-webkit-box-shadow: 
+	inset 3px 3px 3px rgba(0,0,0,0.4);  
+	box-shadow: 
+	inset 3px 3px 3px rgba(0,0,0,0.4);
+	}
+#controls ul {text-align: center; line-height: 30px;}
+#level, #score {display: inline; color: #ffffff; padding: 8px; white-space: nowrap; font-size: 12px;}
+#mutebutton {display: inline-block; width: 20px; height: 20px; background-image: url(mute.svg); 
+	background-color: transparent;
+	border: none; 
+	-webkit-transform: rotate(45deg);}
+#mutebutton.Unmute {background-image: url(muteon.svg);}
+#mutebutton:hover {opacity: 0.7;}
+/* device specifics */
+@media all and (min-device-width: 320px) and (max-device-width: 480px) {
+ body {background-color: #000000;}	
+}
+}
