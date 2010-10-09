@@ -14,7 +14,7 @@ Effect.Game.addEventListener( 'onLoadGame', function() {
       url: '/images/' + theme + '/tile' + number + '.png',
       width: 40,
       height: 40,
-      collisions: true.
+      collisions: true,
       solid: true,
       dieOffScreen: true,
       logic: function(clock){
