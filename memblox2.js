@@ -8,8 +8,9 @@ Effect.Game.addEventListener( 'onLoadGame', function() {
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
     alert( "You clicked " + pt.x + " by " + pt.y );
   });
-  block = (function(){
+  var block = (function(theme){
     var block = {};
+    var number = randomInt(0, 16);
     Sprite.extend( "Block", {
       url: '/images/' + theme + '/tile' + number + '.png',
       width: 40,
@@ -52,6 +53,7 @@ Effect.Game.addEventListener( 'onLoadGame', function() {
           block.right = false;
       }
     });
+    return block;
   })()
   
 });
