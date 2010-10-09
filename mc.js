@@ -126,7 +126,10 @@
       numberOfMatches: 16,
     },
     io : {
-      canvas : {},
+      canvas : {
+          buffer: {},
+          output: {}
+      },
       boardDisplay: {},
       scoreDisplay: {},
       levelDisplay: {}
