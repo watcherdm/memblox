@@ -2,3 +2,4 @@ Read me file for memblox github
 Google HTML5 Game Jam 2010
 
 "Audio Generator":http://superflashbros.net/as3sfxr/
+"HTML5 Game Post":http://www.xanthir.com/blog/
