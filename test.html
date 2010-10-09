@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<canvas width="500" height="500"></canvas>
+<script type="text/javascript">
+  var canvas = document.getElementsByTagName("canvas")[0];
+  var context = canvas.getContext("2d");
+  (function game(){
+    context.fillStyle = "black";
+    context.fillRect(0, 0, 500, 500);
+    
+    context.beginPath();
+      // context.lineTo(pxloc, pxloc);
+    context.closePath();
+    // var gradient = context.createLinearGradient(px,px,px,px);
+    // canvas needs to be redrawn so put this in the recursive
+    //
+    var audio = new Audio();
+    if( audio.canPlayType("audio/mp3") ){
+    // 2 second sound files
+      audio.src = "file name.mp3";
+    }else{
+      audio.src = "file name.mp3";
+    }
+    sfx.play();
+    
+  })()
+</script>
