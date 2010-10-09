@@ -1,19 +1,59 @@
 Effect.Game.addEventListener( 'onLoadGame', function() {
-  Sprite.extend("Block", {
-    tile : 0,
-    flip: function(clock){
-      
-    }
-  });
-  var splane = new SpritePlane( 'Block' );
+  var splane = new SpritePlane( 'Blocks' );
   splane.setZIndex( 2 );
   Effect.Port.setBackground({
-    url: 'mario-bg-1.jpg'
+    url: 'mario-bg-1.jpg'    
   });
   Effect.Port.attach( splane );
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
     alert( "You clicked " + pt.x + " by " + pt.y );
   });
+  block = (function(){
+    var block = {};
+    Sprite.extend( "Block", {
+      url: '/images/' + theme + '/tile' + number + '.png',
+      width: 40,
+      height: 40,
+      collisions: true.
+      solid: true,
+      dieOffScreen: true,
+      logic: function(clock){
+        if(this.left){
+          this.x = this.x - 40;
+        }
+        else if (this.right){
+          this.x = this.x + 40;
+        }
+        if (this.flip) {
+          this.doFlip();
+          this.flip = false;
+        }
+      }
+    });
+    Effect.Game.addEventListener( 'onKeyDown', function(id){
+      switch(id) {
+        case 'left':
+          block.left = true;
+          break;
+        case 'right':
+          block.right = true;
+          break;
+        case 'flip':
+          block.flip = true;
+          break;
+      }
+    });
+    Effect.Game.addEventListener( 'onKeyUp', function(id){
+      switch (id) {
+        case 'left':
+          block.left = false;
+          break;
+        case 'right':
+          block.right = false;
+      }
+    });
+  })()
+  
 });
 
 (function(window, document, undefined) {
