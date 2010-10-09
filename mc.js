@@ -116,6 +116,20 @@
     return newcontrol;
   }
   var memblox = {
+    pause : false,
+    play : function(){
+      (function game(){
+        function renderCanvas(buffer, output){
+          var board = {size:{height:440, width:320}}
+          buffcontext = buffer.getContext('2d');
+          boardback = buffcontext.createLinearContext(0, 0, board.size.height, board.size.width);
+        };
+        renderCanvas();
+        // play the game cycle yo
+        // check for halt or pause
+        setTimeout("game()", 50);
+      })()
+    },
     options : {
       soundEnabled: true,
       bufferMin: 3,
@@ -127,8 +141,14 @@
     },
     io : {
       canvas : {
-          buffer: {},
-          output: {}
+          buffer: document.createElement("canvas"),
+          output: document.creatElement("canvas"),
+          init : function(){
+            this.canvas.buffer.width = boardWidth * aspect_ratio;
+            this.canvas.buffer.height = baseHeight * aspect_ratio;
+            this.canvas.output.width = boardWidth * aspect_ratio;
+            this.canvas.output.height = boardHeight *  aspect_ratio;
+          }
       },
       boardDisplay: {},
       scoreDisplay: {},

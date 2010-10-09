@@ -3,3 +3,14 @@ Google HTML5 Game Jam 2010
 
 "Audio Generator":http://superflashbros.net/as3sfxr/
 "HTML5 Game Post":http://www.xanthir.com/blog/
+
+***********************************************************
+
+issues:
+
+1. Audio sucked need to replace
+2. Hint box
+3. Levels need to be worked on
+4. Top ten self scores local storage
+
+core features:
