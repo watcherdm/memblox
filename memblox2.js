@@ -1,7 +1,10 @@
 Effect.Game.addEventListener( 'onLoadGame', function() {
+  var splane = new SpritePlan( '' );
+  splane.setZIndex( 2 );
   Effect.Port.setBackground({
     color: '#FFFFFF'
   });
+  Effect.Port.attach( splane );
 });
 
 (function(window, document, undefined) {
