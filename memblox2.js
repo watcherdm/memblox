@@ -1,16 +1,20 @@
 Effect.Game.addEventListener( 'onLoadGame', function() {
+  Sprite.extend("Block", {
+    tile : 0,
+    flip: function(clock){
+      
+    }
+  });
   var splane = new SpritePlane( 'Block' );
   splane.setZIndex( 2 );
   Effect.Port.setBackground({
-    color: '#FFFFFF'
+    url: 'mario-bg-1.jpg'
   });
   Effect.Port.attach( splane );
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
     alert( "You clicked " + pt.x + " by " + pt.y );
   });
 });
-
-
 
 (function(window, document, undefined) {
   if(!window.console || !console.log){
