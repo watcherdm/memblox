@@ -1,68 +1,67 @@
-Effect.Game.addEventListener( 'onLoadGame', function() {
-  var splane = new SpritePlane( 'Blocks' );
-  splane.setZIndex( 2 );
-  Effect.Port.setBackground({
-    url: 'mario-bg-1.jpg'    
-  });
-  Effect.Port.attach( splane );
-  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    alert( "You clicked " + pt.x + " by " + pt.y );
-  });
-  var block = (function(theme){
-    var block = {};
-    var number = randomInt(0, 16);
-    Sprite.extend( "Block", {
-      url: '/images/' + theme + '/tile' + number + '.png',
-      width: 40,
-      height: 40,
-      collisions: true,
-      solid: true,
-      dieOffScreen: true,
-      logic: function(clock){
-        if(this.left){
-          this.x = this.x - 40;
-        }
-        else if (this.right){
-          this.x = this.x + 40;
-        }
-        if (this.flip) {
-          this.doFlip();
-          this.flip = false;
-        }
-      }
-    });
-    Effect.Game.addEventListener( 'onKeyDown', function(id){
-      switch(id) {
-        case 'left':
-          block.left = true;
-          break;
-        case 'right':
-          block.right = true;
-          break;
-        case 'flip':
-          block.flip = true;
-          break;
-      }
-    });
-    Effect.Game.addEventListener( 'onKeyUp', function(id){
-      switch (id) {
-        case 'left':
-          block.left = false;
-          break;
-        case 'right':
-          block.right = false;
-      }
-    });
-    return block;
-  })()
-  
-});
-
 (function(window, document, undefined) {
   if(!window.console || !console.log){
     console = {};
     console.log = alert;
   }
+  Effect.Game.addEventListener( 'onLoadGame', function() {
+    var splane = new SpritePlane( 'Blocks' );
+    splane.setZIndex( 2 );
+    Effect.Port.setBackground({
+      url: 'mario-bg-1.jpg',
+      moveX : 2
+    });
+    Effect.Port.attach( splane );
+    Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+      alert( "You clicked " + pt.x + " by " + pt.y );
+    });
+    var block = function(theme){
+      var block = {};
+      var number = randomInt(0, 16);
+      Sprite.extend( "Block", {
+        url: '/images/' + theme + '/tile' + number + '.png',
+        width: 40,
+        height: 40,
+        collisions: true,
+        solid: true,
+        dieOffScreen: true,
+        logic: function(clock){
+          if(this.left){
+            this.x = this.x - 40;
+          }
+          else if (this.right){
+            this.x = this.x + 40;
+          }
+          if (this.flip) {
+            this.doFlip();
+            this.flip = false;
+          }
+        }
+      });
+      Effect.Game.addEventListener( 'onKeyDown', function(id){
+        switch(id) {
+          case 'left':
+            block.left = true;
+            break;
+          case 'right':
+            block.right = true;
+            break;
+          case 'flip':
+            block.flip = true;
+            break;
+        }
+      });
+      Effect.Game.addEventListener( 'onKeyUp', function(id){
+        switch (id) {
+          case 'left':
+            block.left = false;
+            break;
+          case 'right':
+            block.right = false;
+        }
+      });
+      return block;
+    }
+  });
   /* randomInt
    *  @param low : the low number in the return set
    *  @param high : the high number in the return set
@@ -187,7 +186,6 @@ Effect.Game.addEventListener( 'onLoadGame', function() {
           boardback.addColorStop(1, 'rgba(180, 180, 180, 1)');
           buffcontext.fillStyle = boardback;
           buffcontext.fillRect(0, 0, board.size.height, board.size.width);
-          
         };
         renderCanvas();
         // play the game cycle yo
