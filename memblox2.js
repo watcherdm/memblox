@@ -42,7 +42,10 @@ var memblox = (function(window, document, undefined) {
       blockMoved : function(block, direction){/**/return;},
       blockFell : function(block, spaces){/**/return;},
       blockFlipped : function(block){/**/return;},
-      levelCleared : function(level){/**/return;}
+      levelCleared : function(level){
+        this.currentLevel = level + 1;
+        this.matchSetSize = (level + 1) * 2;
+        return;}
     },
     environment: {
       board : [],
@@ -54,6 +57,8 @@ var memblox = (function(window, document, undefined) {
         count : 0,
         blocks : []
       },
+      matchSetSize : 3, // in level change algorithm should be currentLevel * 2
+      matchCount : 0,
       topScores : [],
       players : [],
       theme : 1,
@@ -113,7 +118,7 @@ Sprite.extend('Background',{ url: '/images/backgrounds/' + memblox.environment.t
     this.setImage('/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg');
   }
 });
-Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[memblox.environment.theme] + '/' + randomInt(1, 8) + '.png',
+Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[memblox.environment.theme] + '/' + randomInt(1, 16) + '.png',
         width: memblox.options.pSize,
 	height: memblox.options.pSize,
 	hitRect: new Rect(1, 1, memblox.options.pSize, memblox.options.pSize),
@@ -121,15 +126,25 @@ Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[mem
 	state: 'falling',
 	bumpedSide: false,
         setup: function(clock){
-          this.matchNumber = randomInt(1, 8);
+          this.matchNumber = randomInt(1, memblox.environment.matchSetSize);
           this.setImage("/images/sprites/" + memblox.environment.themes[memblox.environment.theme] + "/" + this.matchNumber + ".png");
         },
 	logic: function(clock) {
           this.bumpedSide = false;
           this.prevX = this.x;
           this.prevY = this.y;
-          if(this.flipping && this.frameX < 9){
-            this.setFrameX(this.frameX + 1);
+          if(this.flipping){
+            if (this.frameX < 9){
+              this.setFrameX(this.frameX + 1);
+            }else{
+              this.flipping = false;
+            }
+          }else if(this.unflipping && !this.flipping){
+            if( this.frameX > 0){
+              this.setFrameX(this.frameX - 1);
+            }else{
+              this.unflipping = false;
+            }
           }
           this[ this.state ](clock);
 	}
@@ -205,10 +220,13 @@ Block.add({
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
           memblox.environment.score += 20 * memblox.environment.currentLevel;
         }
+        memblox.environment.flipped.blocks[0].unflipping = true;
+        this.unflipping = true;
         memblox.environment.flipped.blocks = [];
       }else{
         memblox.environment.flipped.blocks.push(this);
       }
+
       console.log(this.matchNumber);
     }
 });
