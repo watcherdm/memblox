@@ -87,7 +87,7 @@ var memblox = (function(window, document, undefined) {
       matchCount : 0,
       topScores : [],
       players : [],
-      theme : 0,
+      theme : 1,
       themes : ["default","mario"],
       activeblock : null
     },
@@ -182,6 +182,7 @@ var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
+Sprite.extend("TitleButton",{ url: '/images/sprites/title/startGameBtn.png'});
 Sprite.extend('Background',{ url: '/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
   width: memblox.options.boardWidth,
   height: memblox.options.boardHeight,
@@ -313,7 +314,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 		Effect.Game.setState( 'title' );
 		Effect.Port.setScroll( 0, 0 );
 		var splane = Effect.Port.getPlane('TitleSprites');
-		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 130, y: -150, zIndex: 3 } ).tween({
+		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 0, y: -150, zIndex: 3 } ).tween({
 			delay: 0,
 			duration: 180,
 			mode: 'EaseOut',
@@ -335,8 +336,8 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 			mode: 'EaseOut',
 			algorithm: 'Quintic',
 			properties: {
-				x: { start: 340, end: 50 },
-				y: { start: 600, end: 425 }
+				x: { start: 340, end: 70 },
+				y: { start: 600, end: 350 }
 			}
 		}).captureMouse();
 
