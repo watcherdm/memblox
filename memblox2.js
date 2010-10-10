@@ -76,8 +76,8 @@ var memblox = (function(window, document, undefined) {
       blockFell : function(block, spaces){/**/return;},
       blockFlipped : function(block){/**/return;},
       levelCleared : function(obj, level){
-        if((level + 1) == obj.environment.level.length){
-          obj.
+        if((level + 1) => obj.environment.level.length){
+          obj.environment.currentLevel = 1;
         };
         obj.environment.currentLevel = level + 1;
         obj.environment.matchSetSize = (level + 1) * 2;
