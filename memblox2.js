@@ -148,6 +148,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
         break;
       case 'right':
         block.right = false;
+        break;
     }
   });
   var splane = new SpritePlane( 'Blocks' );
@@ -167,8 +168,23 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     splane = Effect.Port.getPlane("Blocks");
     splane.createSprite("Block",{
       x: 40,
-      y: 0
+      y: 0,
+      height: 40,
+      width: 40,
+      setup: function(clock){
+        this.active = true;
+        memblox.environment.activeblock = this;
+      },
+      logic: function(clock){
+        if(this.active){
+          if(this.y > 440){
+            return false;
+          }
+          this.y++;
+        }
+      }
     });
+    splane.draw();
     music.playSound();
   });
      var hud = new HUD( 'myhud' );
