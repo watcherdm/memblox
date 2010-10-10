@@ -69,6 +69,25 @@ var memblox = (function(window, document, undefined) {
         obj.environment.currentLevel = level + 1;
         obj.environment.matchSetSize = (level + 1) * 2;
         obj.environment.matchCount = 0;
+      },
+      gameOver : function(obj){
+        obj.active = false;
+      }
+    },
+    actions : {
+      changeTheme : function(obj, theme_number){
+        if(theme_number < obj.environment.themes.length){
+          obj.environment.theme = theme_number;
+          var bplane = Effect.Port.getPlane("Background");
+          var bsprite = bplane.findSprite({type:"Background"});
+          bsprite.setImage('/images/backgrounds/' + obj.environment.themes[obj.environment.theme] + '/bg1.jpg');
+          // background set
+          var splane = Effect.Port.getPlane("Blocks");
+          var blocks = splane.findSprites({type: "Block"});
+          for(var i = 0, block; block = blocks[i++];){
+            block.setImage("/images/sprites/" + obj.environment.themes[obj.environment.theme] + "/" + block.matchNumber + ".png");
+          }
+        }
       }
     },
     environment: {
@@ -88,6 +107,86 @@ var memblox = (function(window, document, undefined) {
       themes : ["default","mario"],
       activeblock : null
     },
+    doTitleScreen: function() {
+  		// title screen is now loaded
+		Effect.Game.clearSchedule();
+		Effect.Game.setState( 'title' );
+		Effect.Port.setScroll( 0, 0 );
+		var splane = Effect.Port.getPlane('TitleSprites');
+		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 0, y: -150, zIndex: 3 } ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				y: { start: -150, end: 40 }
+			}
+		});
+        // hook mouse events for the buttons
+		splane.createSprite( 'TitleButton', {
+			url: '/images/sprites/title/startGameBtn.png',
+			x: 340,
+			y: 600,
+			zIndex: 4,
+			onMouseUp: function() { memblox.startNewGame(); }
+		} ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				x: { start: 340, end: 70 },
+				y: { start: 600, end: 350 }
+			}
+		}).captureMouse();
+        var themeNames = "Available Themes:\n"
+        for (i=0; i < memblox.environment.themes.length; i++) {
+            themeNames += memblox.environment.themes[i] + "\n";
+        }
+        alert(themeNames);        
+    }, // doTitleScreen
+    startNewGame: function() {
+		// start new game (from title screen)
+		var port = Effect.Port;
+		
+		//memblox.spriteGroups = {};
+		
+		Effect.Audio.quiet();
+		Effect.Game.clearSchedule();
+		Effect.Game.removeAllTweens();
+		Effect.Port.removeAll();
+		//Effect.Port.setBackgroundColor('black');
+        memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5,
+            memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
+        memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 3, 3, "Score:", null);
+        memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
+        var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes
+            [memblox.environment.theme] + "/bg-music.mp3");
+        Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+            var splane = Effect.Port.getPlane("Blocks");
+            var sprite = splane.lookupSpriteFromGlobal(pt);
+            if(sprite){
+                sprite.flip(splane);
+            }
+        });	
+        Effect.Game.loadLevel( 'Default', function(){
+            var bplane = Effect.Port.getPlane("Background");
+            var backsprite = bplane.createSprite("Background");
+            splane = Effect.Port.getPlane("Blocks");
+            splane.createSprite("Block",{x:120, y:-40});
+            splane.draw();
+            music.playSound();
+        });
+        Effect.Game.addEventListener( 'onLogic', function(clock){
+            if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
+                memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
+            }
+            memblox.io.levelDisplay.write(memblox.environment.currentLevel);
+            memblox.io.scoreDisplay.write(memblox.environment.score);
+        });
+	}, // startNewGame
     data : (function(){
       if(openDatabase){
         var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
@@ -137,6 +236,7 @@ var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
+Sprite.extend("TitleButton",{ url: '/images/sprites/title/startGameBtn.png'});
 Sprite.extend('Background',{ url: '/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
   width: memblox.options.boardWidth,
   height: memblox.options.boardHeight,
@@ -180,17 +280,22 @@ Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-                var hit;
-                var dir;
-                if (Effect.Game.isKeyDown("right")) {
-                  hit = this.move( this.width, 0 );
-                  dir = -1;
-                }else if(Effect.Game.isKeyDown("left")){
-                  hit = this.move( -this.width, 0 );
-                  dir = 1;
-                }else if(Effect.Game.isKeyDown("down")){
-                  this.y += 10;
-                }
+        var hit;
+        var dir;
+        if (clock % 3 == 0){
+            if (Effect.Game.isKeyDown("right")) {
+                hit = this.move( this.width, 0 );
+                dir = -1;
+            }else if(Effect.Game.isKeyDown("left")){
+                hit = this.move( -this.width, 0 );
+                dir = 1;
+            }//else if(Effect.Game.isKeyDown("down")){
+                //  this.y += 10;
+                //}
+        }
+        if(Effect.Game.isKeyDown("down")){
+            this.y += 10;
+        }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
 			this.x = this.x + (this.width * dir) ;
@@ -206,7 +311,15 @@ Block.add({
                         }else{
                           memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
+                        var offsetY = this.y % BLOCK_HEIGHT;
+                        if (offsetY > 0) {
+                            this.y -= offsetY;
+                        }
+                        //if (this.y > (GAME_LOWER_BOUNDARY - this.height)){
+                        //    this.y = GAME_LOWER_BOUNDARY - this.height;
+                        //}
                         this.state = 'stuck';
+                        
                 }
 	}
 });
@@ -261,32 +374,6 @@ Block.add({
       console.log(this.matchNumber);
     }
 });
-Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
-  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score: ", null);
-  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Level: ", null);
-  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
-
-  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    var splane = Effect.Port.getPlane("Blocks");
-    var sprite = splane.lookupSpriteFromGlobal(pt);
-    if(sprite){
-      sprite.flip(splane);
-    }
-  });
-  Effect.Game.loadLevel( 'Default', function(){
-    var bplane = Effect.Port.getPlane("Background");
-    var backsprite = bplane.createSprite("Background");
-    splane = Effect.Port.getPlane("Blocks");
-    splane.createSprite("Block",{x:120, y:-40});
-    splane.draw();
-    music.playSound();
-  });
-  Effect.Game.addEventListener( 'onLogic', function(clock){
-    if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
-      memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
-    }
-    memblox.io.levelDisplay.write(memblox.environment.currentLevel);
-    memblox.io.scoreDisplay.write(memblox.environment.score);
-  })
+    Effect.Game.addEventListener( 'onLoadGame',function(){
+        Effect.Game.loadLevel( 'TitleScreen', memblox.doTitleScreen );  
 });
