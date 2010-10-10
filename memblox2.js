@@ -69,6 +69,9 @@ var memblox = (function(window, document, undefined) {
         obj.environment.currentLevel = level + 1;
         obj.environment.matchSetSize = (level + 1) * 2;
         obj.environment.matchCount = 0;
+      },
+      gameOver : function(obj){
+        obj.active = false;
       }
     },
     environment: {
@@ -263,8 +266,8 @@ Block.add({
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
   memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
-  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score: ", null);
-  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Level: ", null);
+  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
+  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
 
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
@@ -283,6 +286,9 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     music.playSound();
   });
   Effect.Game.addEventListener( 'onLogic', function(clock){
+    if(memblox.active == false){
+      return false;
+    }
     if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
       memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
     }
