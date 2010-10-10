@@ -98,12 +98,25 @@ var memblox = (function(window, document, undefined) {
 		//memblox.spriteGroups = {};
 		
 		Effect.Audio.quiet();
-		
 		Effect.Game.clearSchedule();
 		Effect.Game.removeAllTweens();
 		Effect.Port.removeAll();
 		Effect.Port.setBackgroundColor('black');
-	
+        memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5,
+            memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
+        memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 3, 3, "Score:", null);
+        memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
+        var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes
+            [memblox.environment.theme] + "/bg-music.mp3");
+        Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+            var splane = Effect.Port.getPlane("Blocks");
+            var sprite = splane.lookupSpriteFromGlobal(pt);
+            if(sprite){
+                sprite.flip(splane);
+            }
+        });	
         Effect.Game.loadLevel( 'Default', function(){
             var bplane = Effect.Port.getPlane("Background");
             var backsprite = bplane.createSprite("Background");
@@ -294,18 +307,6 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
-  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
-  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
-  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
-
-  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    var splane = Effect.Port.getPlane("Blocks");
-    var sprite = splane.lookupSpriteFromGlobal(pt);
-    if(sprite){
-      sprite.flip(splane);
-    }
-  });
   Effect.Game.loadLevel( 'TitleScreen', function(){
   		// title screen is now loaded
 		Effect.Game.clearSchedule();
@@ -339,6 +340,6 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 			}
 		}).captureMouse();
 
-  };
+  });
 
 });
