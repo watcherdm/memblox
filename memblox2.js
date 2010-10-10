@@ -280,17 +280,22 @@ Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-                var hit;
-                var dir;
-                if (Effect.Game.isKeyDown("right")) {
-                  hit = this.move( this.width, 0 );
-                  dir = -1;
-                }else if(Effect.Game.isKeyDown("left")){
-                  hit = this.move( -this.width, 0 );
-                  dir = 1;
-                }else if(Effect.Game.isKeyDown("down")){
-                  this.y += 10;
-                }
+        var hit;
+        var dir;
+        if (clock % 3 == 0){
+            if (Effect.Game.isKeyDown("right")) {
+                hit = this.move( this.width, 0 );
+                dir = -1;
+            }else if(Effect.Game.isKeyDown("left")){
+                hit = this.move( -this.width, 0 );
+                dir = 1;
+            }//else if(Effect.Game.isKeyDown("down")){
+                //  this.y += 10;
+                //}
+        }
+        if(Effect.Game.isKeyDown("down")){
+            this.y += 10;
+        }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
 			this.x = this.x + (this.width * dir) ;
@@ -306,7 +311,15 @@ Block.add({
                         }else{
                           memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
+                        var offsetY = this.y % BLOCK_HEIGHT;
+                        if (offsetY > 0) {
+                            this.y -= offsetY;
+                        }
+                        //if (this.y > (GAME_LOWER_BOUNDARY - this.height)){
+                        //    this.y = GAME_LOWER_BOUNDARY - this.height;
+                        //}
                         this.state = 'stuck';
+                        
                 }
 	}
 });
