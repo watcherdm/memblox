@@ -103,27 +103,31 @@ var memblox = (function(window, document, undefined) {
       activeblock : null
     },
     data : (function(){
-      var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
-      var msg = [];
-      var addScore = function(player, score){
-        db.transaction(function(tx){
-          tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
-          [player, score],
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);})
-        })
-      };
-      var highScores = function(){
-        db.transaction(function(tx){
-          tx.executeSql("SELECT * FROM scubed ORDER BY score"),
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);}
-        })
-      };
-      return {
-        addScore : addScore,
-        highScores: highScores,
-        msg: msg
+      if(openDatabase){
+        var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
+        var msg = [];
+        var addScore = function(player, score){
+          db.transaction(function(tx){
+            tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
+            [player, score],
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);})
+          })
+        };
+        var highScores = function(){
+          db.transaction(function(tx){
+            tx.executeSql("SELECT * FROM scubed ORDER BY score"),
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);}
+          })
+        };
+        return {
+          addScore : addScore,
+          highScores: highScores,
+          msg: msg
+        }
+      }else{
+        return {};
       }
     })(),
   }
