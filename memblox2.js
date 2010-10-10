@@ -56,7 +56,7 @@ var memblox = (function(window, document, undefined) {
       },
       topScores : [],
       players : [],
-      theme : 0,
+      theme : 1,
       themes : ["default","mario"],
       activeblock : null
     },
@@ -105,10 +105,18 @@ var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
+Sprite.extend('Background',{ url: '/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
+  width: memblox.options.boardWidth,
+  height: memblox.options.boardHeight,
+  setup : function(clock){
+    console.log('/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg');
+    this.setImage('/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg');
+  }
+});
 Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[memblox.environment.theme] + '/' + randomInt(1, 8) + '.png',
-        width: BLOCK_HEIGHT,
-	height: BLOCK_WIDTH,
-	hitRect: new Rect(1, 1, BLOCK_HEIGHT, BLOCK_WIDTH),
+        width: memblox.options.pSize,
+	height: memblox.options.pSize,
+	hitRect: new Rect(1, 1, memblox.options.pSize, memblox.options.pSize),
 	collisions: true,
 	state: 'falling',
 	bumpedSide: false,
@@ -120,6 +128,9 @@ Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[mem
           this.bumpedSide = false;
           this.prevX = this.x;
           this.prevY = this.y;
+          if(this.flipping && this.frameX < 9){
+            this.setFrameX(this.frameX + 1);
+          }
           this[ this.state ](clock);
 	}
 });
@@ -182,35 +193,39 @@ Block.add({
 	}
 });
 
-Effect.Game.addEventListener( 'onLoadGame',function(){
-  block = memblox.environment.activeblock;
-  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
-  Effect.Port.setBackground({
-    url: '/images/background/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
-    xMode : 'infinite',
-    xSpeed : 2
-  });
-  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    var splane = Effect.Port.getPlane("Blocks");
-    var sprite = splane.lookupSpriteFromGlobal(pt);
-    if(sprite){
-      if(memblox.environment.flipped.blocks.length == 1){
-        if (sprite.matchNumber == memblox.environment.flipped.blocks[0].matchNumber && sprite !== memblox.environment.flipped.blocks[0]){
-          if(sprite == memblox.environment.activeblock || memblox.environment.flipped.blocks[0] == memblox.environment.activeblock){
+Block.add({
+  flip : function(splane){
+    this.flipping = true;
+    if(memblox.environment.flipped.blocks.length == 1){
+        if (this.matchNumber == memblox.environment.flipped.blocks[0].matchNumber && this !== memblox.environment.flipped.blocks[0]){
+          if(this == memblox.environment.activeblock || memblox.environment.flipped.blocks[0] == memblox.environment.activeblock){
             memblox.environment.activeblock = splane.createSprite("Block", {x: 120, y: -40});
           }// otherwise just use the active block that is already there, the match was done on the ground
-          splane.deleteSprite(sprite.id);
+          splane.deleteSprite(this.id);
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
           memblox.environment.score += 20 * memblox.environment.currentLevel;
         }
         memblox.environment.flipped.blocks = [];
       }else{
-         memblox.environment.flipped.blocks.push(sprite);
+        memblox.environment.flipped.blocks.push(this);
       }
-      console.log(sprite.matchNumber);
+      console.log(this.matchNumber);
+    }
+});
+Effect.Game.addEventListener( 'onLoadGame',function(){
+  block = memblox.environment.activeblock;
+  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
+
+  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+    var splane = Effect.Port.getPlane("Blocks");
+    var sprite = splane.lookupSpriteFromGlobal(pt);
+    if(sprite){
+      sprite.flip(splane);
     }
   });
   Effect.Game.loadLevel( 'Default', function(){
+    var bplane = Effect.Port.getPlane("Background");
+    var backsprite = bplane.createSprite("Background");
     splane = Effect.Port.getPlane("Blocks");
     splane.createSprite("Block",{x:120, y:-40});
     splane.draw();
