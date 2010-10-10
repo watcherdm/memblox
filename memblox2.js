@@ -1,27 +1,89 @@
+var BLOCK_HEIGHT = 40;
+var BLOCK_WIDTH  = 40;
+var GAME_LEFT_BOUNDARY = 5;
+var GAME_RIGHT_BOUNDARY = GAME_LEFT_BOUNDARY + (BLOCK_WIDTH*10);
+var GAME_UPPER_BOUNDARY = 5;
+var GAME_LOWER_BOUNDARY = GAME_UPPER_BOUNDARY + (BLOCK_HEIGHT*20);
+
+// These are the delays in secs. between block movements for each level
+// index 0 is the delay for level 1, etc.
+//
+var FALL_DELAY = new Array(0.5, 0.45, 0.4, 0.35, 0.25, 0.2, 0.15, 0.1, 0.05); 
+
+var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
 Sprite.extend('Block',{
-  url: "images/sprites/mario/1.png",
-  setup: function(){
-    this.active = true;
-    this.y = 0;
-  },
-  logic : function(){
-      if(this.active){
-        this.y = this.y + 1 * memblox.environment.level.multiplier ;
-      }
-      if(this.left){
-        this.x = this.x - 40;
-      }
-      else if (this.right){
-        this.x = this.x + 40;
-      }
-      if (this.flip) {
-        this.doFlip();
-        this.flip = false;
-      }
-  }
+        width: BLOCK_HEIGHT,
+	height: BLOCK_WIDTH,
+	url: '/images/sprites/mario/1.png',
+	hitRect: new Rect(1, 1, BLOCK_HEIGHT, BLOCK_WIDTH),
+	collisions: true,
+	state: 'falling',
+	bumpedSide: false,
+	logic: function(clock) {
+		this.bumpedSide = false;
+		this.prevX = this.x;
+		this.prevY = this.y;
+		this[ this.state ](clock);
+	}
+});
+/*Block.add({
+	handleKeyDown: function(key) {
+		if ('falling' == this.state) {
+			switch(key) {
+				case 'left': this.xd = -this.width;
+					     break;
+				case 'right': this.xd = this.width;
+					     break;
+			}
+		}
+	}
+});*/
+Block.add({
+	falling: function(clock) {
+		// now move the sprite, horizontal only first
+		//
+		var hit = this.move( this.xd, 0 );
+		if (this.didCollideX(hit)) {
+		    
+		    	this.bumpedSide = true;
+			// if we hit something solid, stop our horiz movement
+			this.x -= this.xd;
+		}
+		this.xd = 0;
+		
+		// now move the sprite vertically
+		//
+                console.log(this.y);
+                var hit = this.move( 0, this.height );
+                if (this.didCollideY(hit)) {
+                        // if we hit something solid, stop our vert movement
+                        this.y -= this.height;
+                        this.state = 'stuck';
+                }
+	}
+});
+Block.add({
+	didCollideX: function(hit) {
+		return (hit && (hit.target.solid ||
+		       (hit.target.type == 'Block' && hit.target.state == 'stuck'))) ||
+		       this.x < GAME_LEFT_BOUNDARY ||
+		       this.x > GAME_RIGHT_BOUNDARY - this.width;
+	},
+	
+	didCollideY: function(hit) {
+		return (hit && (hit.target.solid ||
+		       (hit.target.type == 'Block' && hit.target.state == 'stuck'))) ||
+		       this.y > GAME_LOWER_BOUNDARY - this.height;
+	}
+});
+
+Block.add({
+	stuck: function(clock) {
+		this.xd = this.yd = 0;
+	}
 });
 (function(window, document, undefined) {
   if(!window.console || !console.log){
@@ -77,8 +139,8 @@ Sprite.extend('Block',{
       bufferMin: 3,
       bufferMax: 10,
       pSize:40,
-      boardHeight: 0,
-      boardWidth: 0,
+      boardHeight: 480,
+      boardWidth: 320,
       numberOfMatches: 16,
     },
     io : {
@@ -131,26 +193,6 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
   var number = randomInt(1, 16);
   
   block = memblox.environment.activeblock;
-  Effect.Game.addEventListener( 'onKeyDown', function(id){
-    switch(id) {
-      case 'left':
-        block.left = true;
-        break;
-      case 'right':
-        block.right = true;
-        break;
-    }
-  });
-  Effect.Game.addEventListener( 'onKeyUp', function(id){
-    switch (id) {
-      case 'left':
-        block.left = false;
-        break;
-      case 'right':
-        block.right = false;
-        break;
-    }
-  });
   var splane = new SpritePlane( 'Blocks' );
   splane.setZIndex( 2 );
   var music = Effect.Audio.getTrack("/audio/music/mario/bg-music.mp3");
@@ -166,25 +208,16 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
   });
   Effect.Game.loadLevel( 'Default', function(){
     splane = Effect.Port.getPlane("Blocks");
-    splane.createSprite("Block",{
-      x: 40,
-      y: 0,
-      height: 40,
-      width: 40,
-      setup: function(clock){
-        this.active = true;
-        memblox.environment.activeblock = this;
-      },
-      logic: function(clock){
-        if(this.active){
-          if(this.y > 440){
-            return false;
-          }
-          this.y++;
-        }
-      }
-    });
-    splane.draw();
+    function makeNewBlock(splane){
+      splane.createSprite("Block",{
+        x: 40,
+        y: 0,
+        height: memblox.options.pSize,
+        width: memblox.options.pSize
+      });
+      splane.draw();
+    }
+    makeNewBlock(splane);
     music.playSound();
   });
      var hud = new HUD( 'myhud' );
