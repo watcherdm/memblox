@@ -87,7 +87,7 @@ var memblox = (function(window, document, undefined) {
       matchCount : 0,
       topScores : [],
       players : [],
-      theme : 0,
+      theme : 1,
       themes : ["default","mario"],
       activeblock : null
     },
