@@ -74,6 +74,14 @@ var memblox = (function(window, document, undefined) {
         obj.active = false;
       }
     },
+    actions : {
+      changeTheme : function(obj, theme_number){
+        if(theme_number < obj.environment.themes.length){
+          obj.environment.theme = theme_number;
+          //var bpanel = Effect.Game.g
+        }
+      }
+    },
     environment: {
       player : "",
       score : 0,
