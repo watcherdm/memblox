@@ -1,3 +1,28 @@
+function randomInt(low, high){
+  return Math.floor(Math.random() * (high - (low - 1))) + low;
+}
+Sprite.extend('Block',{
+  url: "images/sprites/mario/1.png",
+  setup: function(){
+    this.active = true;
+    this.y = 0;
+  },
+  logic : function(){
+      if(this.active){
+        this.y = this.y + 1 * memblox.environment.level.multiplier ;
+      }
+      if(this.left){
+        this.x = this.x - 40;
+      }
+      else if (this.right){
+        this.x = this.x + 40;
+      }
+      if (this.flip) {
+        this.doFlip();
+        this.flip = false;
+      }
+  }
+});
 (function(window, document, undefined) {
   if(!window.console || !console.log){
     console = {};
@@ -7,9 +32,7 @@
    *  @param low : the low number in the return set
    *  @param high : the high number in the return set
    */
-  function randomInt(low, high){
-    return Math.floor(Math.random() * (high - (low - 1))) + low;
-  }
+
   // EventTarget class acts as base for custom events
   var memblox = {
     pause : false,
@@ -78,7 +101,8 @@
       board : [],
       player : "",
       score : 0,
-      level : 0,
+      currentLevel : 0,
+      level : [1.1,1.2,1.3,1.4],
       flipped : {
         count : 0,
         blocks : []
@@ -86,7 +110,8 @@
       topScores : [],
       players : [],
       theme : 1,
-      themes : ["default","mario"]
+      themes : ["default","mario"],
+      activeblock : null
     },
     data: {
       db: {},
@@ -100,30 +125,11 @@
   }
   window.memblox = memblox;
 })(window, window.document)
+
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.init(),
-  Sprite.extend('Block',{
-    url: "/images/sprites/color_01.png",
-    setup: function(){
-      this.active = true;
-      this.y = 0;
-    },
-    logic : function(){
-        if(this.active){
-          this.y ++;
-        }
-        if(this.left){
-          this.x = this.x - 40;
-        }
-        else if (this.right){
-          this.x = this.x + 40;
-        }
-        if (this.flip) {
-          this.doFlip();
-          this.flip = false;
-        }
-    }
-  });
+  memblox.init();
+  var number = randomInt(1, 16);
+  
   block = memblox.environment.activeblock;
   Effect.Game.addEventListener( 'onKeyDown', function(id){
     switch(id) {
@@ -158,6 +164,11 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     alert( "You clicked " + pt.x + " by " + pt.y );
   });
   Effect.Game.loadLevel( 'Default', function(){
+    splane = Effect.Port.getPlane("Blocks");
+    splane.createSprite("Block",{
+      x: 40,
+      y: 0
+    });
     music.playSound();
   });
 });
