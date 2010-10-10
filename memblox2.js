@@ -11,9 +11,6 @@ var memblox = (function(window, document, undefined) {
   // EventTarget class acts as base for custom events
   var memblox = {
     pause : false,
-    init : function(){
-      
-    },
     objects : {
       blocks : []
     },
@@ -27,8 +24,13 @@ var memblox = (function(window, document, undefined) {
       numberOfMatches: 16,
     },
     io : {
-      boardDisplay: {},
-      scoreDisplay: {},
+      messageDisplay: {write: function(msg){console.log(msg);}},
+      scoreDisplay: {
+        write: function(msg){
+          var hud = new HUD("scoreDisplay");
+        }
+        
+      },
       levelDisplay: {}
     },
     actions: {
@@ -139,24 +141,20 @@ Block.add({
 			this.x = this.x + (this.width * dir) ;
 		}
 		this.xd = 0;
-                var hit = this.move( 0, 1 * speed );
+                var hit = this.move( 0, 1 * memblox.environment.currentLevel );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
-                        this.y = this.y - (1 * speed);             
+                        this.y = this.y - (1 * memblox.environment.currentLevel);             
                         var splane = Effect.Port.getPlane("Blocks");
                         if(this.y >= 0){
-                          hud.setString(0, 0, "Score Me!");
-                          splane.createSprite("Block",{url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',x: 160, y:-40});
+                          memblox.environment.activeblock = splane.createSprite("Block",{x: 120, y:-40});
                         }else{
-                          alert("GAME OVER SUCKA!");
+                          memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
                         this.state = 'stuck';
                 }
 	}
 });
-Block.add({
-  
-})
 Block.add({
 	didCollideX: function(hit) {
 		return (hit && (hit.target.solid ||
@@ -174,12 +172,17 @@ Block.add({
 
 Block.add({
 	stuck: function(clock) {
-		this.xd = this.yd = 0;
+		var hit = this.move( 0, 1 * memblox.environment.currentLevel );
+                if (this.didCollideY(hit)) {
+                        // if we hit something solid, stop our vert movement
+                        this.y = this.y - (1 * memblox.environment.currentLevel);             
+                        var splane = Effect.Port.getPlane("Blocks");
+                        this.state = 'stuck';
+                }
 	}
 });
 
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.init();
   block = memblox.environment.activeblock;
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
   Effect.Port.setBackground({
@@ -187,28 +190,33 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     xMode : 'infinite',
     xSpeed : 2
   });
-  Effect.Port.attach( splane );
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
     var splane = Effect.Port.getPlane("Blocks");
     var sprite = splane.lookupSpriteFromGlobal(pt);
     if(sprite){
       if(memblox.environment.flipped.blocks.length == 1){
         if (sprite.matchNumber == memblox.environment.flipped.blocks[0].matchNumber && sprite !== memblox.environment.flipped.blocks[0]){
+          if(sprite == memblox.environment.activeblock || memblox.environment.flipped.blocks[0] == memblox.environment.activeblock){
+            memblox.environment.activeblock = splane.createSprite("Block", {x: 120, y: -40});
+          }// otherwise just use the active block that is already there, the match was done on the ground
           splane.deleteSprite(sprite.id);
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
-          splane.createSprite("Block", {x: 120, y: -40});
-          splane.
+          memblox.environment.score += 20 * memblox.environment.currentLevel;
         }
         memblox.environment.flipped.blocks = [];
       }else{
          memblox.environment.flipped.blocks.push(sprite);
       }
-      alert(sprite.matchNumber);
+      console.log(sprite.matchNumber);
     }
   });
   Effect.Game.loadLevel( 'Default', function(){
     splane = Effect.Port.getPlane("Blocks");
+    splane.createSprite("Block",{x:120, y:-40});
     splane.draw();
     music.playSound();
   });
+  Effect.Game.addEventListener( 'onLogic', function(clock){
+    memblox.io.scoreDisplay.write(memblox.environment.score);
+  })
 });
