@@ -15,37 +15,7 @@ var memblox = (function(window, document, undefined) {
       
     },
     objects : {
-      block : function(theme){
-        var block = {};
-        var number = randomInt(0, 16);
-        Block.add({
-          setup: function(){
-            // this needs to establish the tile
-          },
-          logic: function(clock){
-          
-          }
-        });
-
-        return block;
-      }
-    },
-    play : function(){
-      (function game(){
-        function renderCanvas(buffer, output){
-          var board = {size:{height:440, width:320}}
-          buffcontext = buffer.getContext('2d');
-          boardback = buffcontext.createLinearContext(0, 0, board.size.height, board.size.width);
-          boardback.addColorStop(0, 'rgba(100, 100, 100, 1)');
-          boardback.addColorStop(1, 'rgba(180, 180, 180, 1)');
-          buffcontext.fillStyle = boardback;
-          buffcontext.fillRect(0, 0, board.size.height, board.size.width);
-        };
-        renderCanvas();
-        // play the game cycle yo
-        // check for halt or pause
-        setTimeout("game()", 50);
-      })()
+      blocks : []
     },
     options : {
       soundEnabled: true,
@@ -76,8 +46,8 @@ var memblox = (function(window, document, undefined) {
       board : [],
       player : "",
       score : 0,
-      currentLevel : 0,
-      level : [1.1,1.2,1.3,1.4],
+      currentLevel :1,
+      level : [1,2,3,4,5,6,7,8],
       flipped : {
         count : 0,
         blocks : []
@@ -88,15 +58,30 @@ var memblox = (function(window, document, undefined) {
       themes : ["default","mario"],
       activeblock : null
     },
-    data: {
-      db: {},
-      text : {}
-    },
-    assets: {
-      sprite : ["Block"],
-      images : [],
-      sounds : []
-    }
+    data : (function(){
+      var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
+      var msg = [];
+      var addScore = function(player, score){
+        db.transaction(function(tx){
+          tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
+          [player, score],
+          function(tx, data){msg.push(data);},
+          function(tx, e){msg.push(e);})
+        })
+      };
+      var highScores = function(){
+        db.transaction(function(tx){
+          tx.executeSql("SELECT * FROM scubed ORDER BY score"),
+          function(tx, data){msg.push(data);},
+          function(tx, e){msg.push(e);}
+        })
+      };
+      return {
+        addScore : addScore,
+        highScores: highScores,
+        msg: msg
+      }
+    })(),
   }
   return memblox;
 })(window, window.document)
@@ -130,10 +115,10 @@ Sprite.extend('Block',{	url: '/images/sprites/' + memblox.environment.themes[mem
           this.setImage("/images/sprites/" + memblox.environment.themes[memblox.environment.theme] + "/" + this.matchNumber + ".png");
         },
 	logic: function(clock) {
-		this.bumpedSide = false;
-		this.prevX = this.x;
-		this.prevY = this.y;
-		this[ this.state ](clock);
+          this.bumpedSide = false;
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this[ this.state ](clock);
 	}
 });
 Block.add({
@@ -149,22 +134,18 @@ Block.add({
                   hit = this.move( -this.width, 0 );
                   dir = 1;
                 }
- // and detenct collision
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
-			// if we hit something solid, stop our horiz movement
 			this.x = this.x + (this.width * dir) ;
 		}
 		this.xd = 0;
-		
-		// now move the sprite vertically
-		//
                 var hit = this.move( 0, 1 * speed );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
-                        this.y = this.y - (1 * speed);                
+                        this.y = this.y - (1 * speed);             
                         var splane = Effect.Port.getPlane("Blocks");
                         if(this.y >= 0){
+                          hud.setString(0, 0, "Score Me!");
                           splane.createSprite("Block",{url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',x: 160, y:-40});
                         }else{
                           alert("GAME OVER SUCKA!");
@@ -199,19 +180,15 @@ Block.add({
 
 Effect.Game.addEventListener( 'onLoadGame',function(){
   memblox.init();
-  
   block = memblox.environment.activeblock;
-  var splane = new SpritePlane( 'Blocks' );
-  splane.setZIndex( 2 );
-  var music = Effect.Audio.getTrack("/audio/music/mario/bg-music.mp3");
+  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
   Effect.Port.setBackground({
-    url: '/images/background/mario/bg1.jpg',
+    url: '/images/background/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
     xMode : 'infinite',
     xSpeed : 2
   });
   Effect.Port.attach( splane );
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    // there needs to be useful
     var splane = Effect.Port.getPlane("Blocks");
     var sprite = splane.lookupSpriteFromGlobal(pt);
     if(sprite){
@@ -220,7 +197,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
           splane.deleteSprite(sprite.id);
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
           splane.createSprite("Block", {x: 120, y: -40});
-          // add drop state physics
+          splane.
         }
         memblox.environment.flipped.blocks = [];
       }else{
@@ -228,18 +205,10 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
       }
       alert(sprite.matchNumber);
     }
-    //alert( "You clicked " + pt.x + " by " + pt.y );
   });
   Effect.Game.loadLevel( 'Default', function(){
-  splane = Effect.Port.getPlane("Blocks");
+    splane = Effect.Port.getPlane("Blocks");
     splane.draw();
     music.playSound();
   });
-  var hud = new HUD( 'myhud' );
-   hud.setFont( 'Optimer18Test' );
-   hud.setTableSize( 15, 4 );  // This sets the total number of characters allowed horizontally and vertically
-   hud.setTracking( .8, 1.0 );  // Spacing between letters horiz and vert, where 1.0 means normal, 0.5 means more squeezed together, and 1.5 means more spaced apart
-   hud.setPosition( 40, 50 );
-   hud.setZIndex( 3 );
-   Effect.Port.attach( hud );
 });
