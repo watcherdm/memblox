@@ -1,25 +1,3 @@
-Sprite.extend('Block',{
-  url: "/images/sprites/color_01.png",
-  setup: function(){
-    this.active = true;
-    this.y = 0;
-  },
-  logic : function(){
-      if(this.active){
-        this.y ++;
-      }
-      if(this.left){
-        this.x = this.x - 40;
-      }
-      else if (this.right){
-        this.x = this.x + 40;
-      }
-      if (this.flip) {
-        this.doFlip();
-        this.flip = false;
-      }
-  }
-});  
 (function(window, document, undefined) {
   if(!window.console || !console.log){
     console = {};
@@ -36,22 +14,7 @@ Sprite.extend('Block',{
   var memblox = {
     pause : false,
     init : function(){
-      var splane = new SpritePlane( 'Blocks' );
-      splane.setZIndex( 2 );
-      var music = Effect.Audio.getTrack("/audio/music/mario/bg-music.mp3");
-      Effect.Port.setBackground({
-        url: '/images/background/mario/bg1.jpg',
-        xMode : 'infinite',
-        xSpeed : 2
-      });
-      Effect.Port.attach( splane );
-      Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-        // there needs to be useful
-        alert( "You clicked " + pt.x + " by " + pt.y );
-      });
-      Effect.Game.loadLevel( 'Default', function(){
-        music.playSound();
-      });
+      
     },
     objects : {
       block : function(theme){
@@ -65,28 +28,7 @@ Sprite.extend('Block',{
           
           }
         });
-        Effect.Game.addEventListener( 'onKeyDown', function(id){
-          switch(id) {
-            case 'left':
-              block.left = true;
-              break;
-            case 'right':
-              block.right = true;
-              break;
-            case 'flip':
-              block.flip = true;
-              break;
-          }
-        });
-        Effect.Game.addEventListener( 'onKeyUp', function(id){
-          switch (id) {
-            case 'left':
-              block.left = false;
-              break;
-            case 'right':
-              block.right = false;
-          }
-        });
+
         return block;
       }
     },
@@ -158,4 +100,64 @@ Sprite.extend('Block',{
   }
   window.memblox = memblox;
 })(window, window.document)
-Effect.Game.addEventListener( 'onLoadGame',memblox.init)
+Effect.Game.addEventListener( 'onLoadGame',function(){
+  memblox.init(),
+  Sprite.extend('Block',{
+    url: "/images/sprites/color_01.png",
+    setup: function(){
+      this.active = true;
+      this.y = 0;
+    },
+    logic : function(){
+        if(this.active){
+          this.y ++;
+        }
+        if(this.left){
+          this.x = this.x - 40;
+        }
+        else if (this.right){
+          this.x = this.x + 40;
+        }
+        if (this.flip) {
+          this.doFlip();
+          this.flip = false;
+        }
+    }
+  });
+  block = memblox.environment.activeblock;
+  Effect.Game.addEventListener( 'onKeyDown', function(id){
+    switch(id) {
+      case 'left':
+        block.left = true;
+        break;
+      case 'right':
+        block.right = true;
+        break;
+    }
+  });
+  Effect.Game.addEventListener( 'onKeyUp', function(id){
+    switch (id) {
+      case 'left':
+        block.left = false;
+        break;
+      case 'right':
+        block.right = false;
+    }
+  });
+  var splane = new SpritePlane( 'Blocks' );
+  splane.setZIndex( 2 );
+  var music = Effect.Audio.getTrack("/audio/music/mario/bg-music.mp3");
+  Effect.Port.setBackground({
+    url: '/images/background/mario/bg1.jpg',
+    xMode : 'infinite',
+    xSpeed : 2
+  });
+  Effect.Port.attach( splane );
+  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+    // there needs to be useful
+    alert( "You clicked " + pt.x + " by " + pt.y );
+  });
+  Effect.Game.loadLevel( 'Default', function(){
+    music.playSound();
+  });
+});
