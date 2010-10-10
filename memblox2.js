@@ -14,14 +14,16 @@ var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
-Sprite.extend('Block',{
+Sprite.extend('Block',{	url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',
         width: BLOCK_HEIGHT,
 	height: BLOCK_WIDTH,
-	url: '/images/sprites/mario/1.png',
 	hitRect: new Rect(1, 1, BLOCK_HEIGHT, BLOCK_WIDTH),
 	collisions: true,
 	state: 'falling',
 	bumpedSide: false,
+        setup: function(clock){
+          this.setImage("/images/sprites/mario/" + randomInt(1, 8) + ".png");
+        },
 	logic: function(clock) {
 		this.bumpedSide = false;
 		this.prevX = this.x;
@@ -29,40 +31,35 @@ Sprite.extend('Block',{
 		this[ this.state ](clock);
 	}
 });
-/*Block.add({
-	handleKeyDown: function(key) {
-		if ('falling' == this.state) {
-			switch(key) {
-				case 'left': this.xd = -this.width;
-					     break;
-				case 'right': this.xd = this.width;
-					     break;
-			}
-		}
-	}
-});*/
 Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-		var hit = this.move( this.xd, 0 );
+                var hit;
+                var dir;
+                if (Effect.Game.isKeyDown("right")) {
+                  hit = this.move( this.width, 0 );
+                  dir = -1;
+                }else if(Effect.Game.isKeyDown("left")){
+                  hit = this.move( -this.width, 0 );
+                  dir = 1;
+                }
+ // and detenct collision
 		if (this.didCollideX(hit)) {
-		    
 		    	this.bumpedSide = true;
 			// if we hit something solid, stop our horiz movement
-			this.x -= this.xd;
+			this.x = this.x + (this.width * dir) ;
 		}
 		this.xd = 0;
 		
 		// now move the sprite vertically
 		//
-                console.log(this.y);
                 var hit = this.move( 0, 1 );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
                         this.y--;                
                         var splane = Effect.Port.getPlane("Blocks");
-                        splane.createSprite("Block",{x: 160, y:0});
+                        splane.createSprite("Block",{	url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',x: 160, y:0});
                         this.state = 'stuck';
                 }
 	}
@@ -192,7 +189,6 @@ Block.add({
 
 Effect.Game.addEventListener( 'onLoadGame',function(){
   memblox.init();
-  var number = randomInt(1, 16);
   
   block = memblox.environment.activeblock;
   var splane = new SpritePlane( 'Blocks' );
@@ -209,17 +205,8 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     alert( "You clicked " + pt.x + " by " + pt.y );
   });
   Effect.Game.loadLevel( 'Default', function(){
-    splane = Effect.Port.getPlane("Blocks");
-    function makeNewBlock(splane){
-      splane.createSprite("Block",{
-        x: 40,
-        y: 0,
-        height: memblox.options.pSize,
-        width: memblox.options.pSize
-      });
-      splane.draw();
-    }
-    makeNewBlock(splane);
+  splane = Effect.Port.getPlane("Blocks");
+    splane.draw();
     music.playSound();
   });
      var hud = new HUD( 'myhud' );
