@@ -1,15 +1,26 @@
 Effect.Game.addEventListener( 'onLoadGame', function() {
-
+//  HUD plane for info display
 //  Use hud.setString( 0, 0, "Hello World!" );  Pass the starting horiztontal and vertical character postiions (0,0 is top-left)
    var hud = new HUD( 'myhud' );
-   hud.setFont( 'Optimer18White' );
+   hud.setFont( 'Optimer18Test' );
    hud.setTableSize( 10, 2 );  // This sets the total number of characters allowed horizontally and vertically
    hud.setTracking( 1.0, 1.0 );  // Spacing between letters horiz and vert, where 1.0 means normal, 0.5 means more squeezed together, and 1.5 means more spaced apart
    hud.setPosition( 60, 60 );
    hud.setZIndex( 3 );
    Effect.Port.attach( hud );
 
-
+//  TextSprite for info display
+//  Use tsprite.setString( 0, 0, "Hello World!" );  Pass the starting horiztontal and vertical character postiions (0,0 is top-left)
+/*   var infoPlane = new SpritePlane( 'sprites' );
+   Effect.Port.attach( plane );
+   var tsprite = new TextSprite( 'mytext' );
+   tsprite.setFont( 'Optimer18Test' );
+   tsprite.setTableSize( 10, 2 );
+   tsprite.setTracking( 1.0, 1.0 );
+   tsprite.x = 60;
+   tsprite.y = 60;
+   infoPlane.attach( tsprite );
+*/
 
   Sprite.extend("Block", {
     tile : 0,
