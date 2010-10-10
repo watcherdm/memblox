@@ -3,6 +3,43 @@ var memblox = (function(window, document, undefined) {
     console = {};
     console.log = alert;
   }
+  // makeHud method for creating new Heads up display
+  function makeHud(id, cols, rows, font, x, y, prefix, suffix){
+   var thishud = (function(Port, id, cols, rows, font, x, y, prefix, suffix){
+      var hud = new HUD(id);
+      var lastmsg = "";
+      var prefix = prefix;
+      var suffix = suffix;
+      
+      hud.setFont(font);
+      hud.setPosition(x, y);
+      hud.setTableSize(cols, rows);
+      hud.setTracking(.7, 1.2);
+      
+      Port.attach(hud);
+      
+      return {
+        hud: hud,
+        write: function(msg){
+          var clearString = "";
+          var i = cols;
+          while(i--){
+            clearString += " ";
+          };
+          hud.setString(0,0,clearString)
+          lastmessage = msg;
+          msg = (prefix) ? prefix + msg : msg;
+          msg = (suffix) ? msg + suffix : msg;
+          hud.setString(0,0,msg);
+        },
+        read: function(){
+          return lastmsg;
+        }
+      };
+    })(Effect.Port,id, cols, rows, font, x, y, prefix, suffix)
+    return thishud;
+  }
+
   /* randomInt
    *  @param low : the low number in the return set
    *  @param high : the high number in the return set
@@ -12,7 +49,8 @@ var memblox = (function(window, document, undefined) {
   var memblox = {
     pause : false,
     objects : {
-      blocks : []
+      blocks : [],
+      makeHud : makeHud
     },
     options : {
       soundEnabled: true,
@@ -24,13 +62,8 @@ var memblox = (function(window, document, undefined) {
       numberOfMatches: 16,
     },
     io : {
-      messageDisplay: {write: function(msg){console.log(msg);}},
-      scoreDisplay: {
-        write: function(msg){
-          var hud = new HUD("scoreDisplay");
-        }
-        
-      },
+      messageDisplay: {},
+      scoreDisplay: {},
       levelDisplay: {}
     },
     actions: {
@@ -42,10 +75,14 @@ var memblox = (function(window, document, undefined) {
       blockMoved : function(block, direction){/**/return;},
       blockFell : function(block, spaces){/**/return;},
       blockFlipped : function(block){/**/return;},
-      levelCleared : function(level){
-        this.currentLevel = level + 1;
-        this.matchSetSize = (level + 1) * 2;
-        return;}
+      levelCleared : function(obj, level){
+        if((level + 1) >= obj.environment.level.length){
+          obj.environment.currentLevel = 1;
+        };
+        obj.environment.currentLevel = level + 1;
+        obj.environment.matchSetSize = (level + 1) * 2;
+        obj.environment.matchCount = 0;
+      }
     },
     environment: {
       board : [],
@@ -66,27 +103,31 @@ var memblox = (function(window, document, undefined) {
       activeblock : null
     },
     data : (function(){
-      var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
-      var msg = [];
-      var addScore = function(player, score){
-        db.transaction(function(tx){
-          tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
-          [player, score],
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);})
-        })
-      };
-      var highScores = function(){
-        db.transaction(function(tx){
-          tx.executeSql("SELECT * FROM scubed ORDER BY score"),
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);}
-        })
-      };
-      return {
-        addScore : addScore,
-        highScores: highScores,
-        msg: msg
+      if(openDatabase){
+        var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
+        var msg = [];
+        var addScore = function(player, score){
+          db.transaction(function(tx){
+            tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
+            [player, score],
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);})
+          })
+        };
+        var highScores = function(){
+          db.transaction(function(tx){
+            tx.executeSql("SELECT * FROM scubed ORDER BY score"),
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);}
+          })
+        };
+        return {
+          addScore : addScore,
+          highScores: highScores,
+          msg: msg
+        }
+      }else{
+        return {};
       }
     })(),
   }
@@ -161,6 +202,8 @@ Block.add({
                 }else if(Effect.Game.isKeyDown("left")){
                   hit = this.move( -this.width, 0 );
                   dir = 1;
+                }else if(Effect.Game.isKeyDown("down")){
+                  this.y += 10;
                 }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
@@ -218,7 +261,9 @@ Block.add({
           }// otherwise just use the active block that is already there, the match was done on the ground
           splane.deleteSprite(this.id);
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
+          memblox.environment.matchCount += 1;
           memblox.environment.score += 20 * memblox.environment.currentLevel;
+          console.log(memblox.environment.matchCount);
         }
         memblox.environment.flipped.blocks[0].unflipping = true;
         this.unflipping = true;
@@ -231,7 +276,9 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  block = memblox.environment.activeblock;
+  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
+  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score: ", null);
+  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Level: ", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
 
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
@@ -250,7 +297,10 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     music.playSound();
   });
   Effect.Game.addEventListener( 'onLogic', function(clock){
-    
+    if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
+      memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
+    }
+    memblox.io.levelDisplay.write(memblox.environment.currentLevel);
     memblox.io.scoreDisplay.write(memblox.environment.score);
   })
 });
