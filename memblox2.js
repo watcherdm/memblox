@@ -3,6 +3,44 @@ var memblox = (function(window, document, undefined) {
     console = {};
     console.log = alert;
   }
+  // makeHud method for creating new Heads up display
+  function makeHud(id, cols, rows, font, x, y, prefix, suffix){
+
+   var thishud = (function(Port, id, cols, rows, font, x, y, prefix, suffix){
+      var hud = new HUD(id);
+      var lastmsg = "";
+      var prefix = prefix;
+      var suffix = suffix;
+      
+      hud.setFont(font);
+      hud.setPosition(x, y);
+      hud.setTableSize(cols, rows);
+      hud.setTracking(.7, 1.2);
+      
+      Port.attach(hud);
+      
+      return {
+        hud: hud,
+        write: function(msg){
+          var clearString = "";
+          var i = cols;
+          while(i--){
+            clearString += " ";
+          };
+          hud.setString(0,0,clearString)
+          lastmessage = msg;
+          msg = (prefix) ? prefix + msg : msg;
+          msg = (suffix) ? msg + suffix : msg;
+          hud.setString(0,0,msg);
+        },
+        read: function(){
+          return lastmsg;
+        }
+      };
+    })(Effect.Port,id, cols, rows, font, x, y, prefix, suffix)
+    return thishud;
+  }
+
   /* randomInt
    *  @param low : the low number in the return set
    *  @param high : the high number in the return set
@@ -24,13 +62,8 @@ var memblox = (function(window, document, undefined) {
       numberOfMatches: 16,
     },
     io : {
-      messageDisplay: {write: function(msg){console.log(msg);}},
-      scoreDisplay: {
-        write: function(msg){
-          var hud = new HUD("scoreDisplay");
-        }
-        
-      },
+      messageDisplay: {},
+      scoreDisplay: {},
       levelDisplay: {}
     },
     actions: {
@@ -231,7 +264,9 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  block = memblox.environment.activeblock;
+  memblox.io.messageDisplay = makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme], 50, 3, null, null);
+  memblox.io.scoreDisplay = makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme], 3, 3, "Score: ", null);
+  memblox.io.levelDisplay = makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme], 176, 3, "Level: ", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
 
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
