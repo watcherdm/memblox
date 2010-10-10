@@ -56,7 +56,7 @@ var memblox = (function(window, document, undefined) {
       },
       topScores : [],
       players : [],
-      theme : 1,
+      theme : 0,
       themes : ["default","mario"],
       activeblock : null
     },
@@ -217,6 +217,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     music.playSound();
   });
   Effect.Game.addEventListener( 'onLogic', function(clock){
+    
     memblox.io.scoreDisplay.write(memblox.environment.score);
   })
 });
