@@ -3,22 +3,26 @@ Effect.Game.addEventListener( 'onLoadGame', function() {
 //  Use hud.setString( 0, 0, "Hello World!" );  Pass the starting horiztontal and vertical character postiions (0,0 is top-left)
    var hud = new HUD( 'myhud' );
    hud.setFont( 'Optimer18Test' );
-   hud.setTableSize( 10, 2 );  // This sets the total number of characters allowed horizontally and vertically
-   hud.setTracking( 1.0, 1.0 );  // Spacing between letters horiz and vert, where 1.0 means normal, 0.5 means more squeezed together, and 1.5 means more spaced apart
-   hud.setPosition( 60, 60 );
+   hud.setTableSize( 15, 4 );  // This sets the total number of characters allowed horizontally and vertically
+   hud.setTracking( .8, 1.0 );  // Spacing between letters horiz and vert, where 1.0 means normal, 0.5 means more squeezed together, and 1.5 means more spaced apart
+   hud.setPosition( 40, 50 );
    hud.setZIndex( 3 );
    Effect.Port.attach( hud );
 
+  hud.setString( 0, 0, "Game HUD" );
+  hud.setString( 0, 1, "Second Line" );
+  hud.setString( 0, 2, "Third Line" );
+  hud.setString( 0, 3, "1234567890123456" );
 //  TextSprite for info display
 //  Use tsprite.setString( 0, 0, "Hello World!" );  Pass the starting horiztontal and vertical character postiions (0,0 is top-left)
 /*   var infoPlane = new SpritePlane( 'sprites' );
    Effect.Port.attach( plane );
    var tsprite = new TextSprite( 'mytext' );
    tsprite.setFont( 'Optimer18Test' );
-   tsprite.setTableSize( 10, 2 );
+   tsprite.setTableSize( 15, 4 );
    tsprite.setTracking( 1.0, 1.0 );
-   tsprite.x = 60;
-   tsprite.y = 60;
+   tsprite.x = 40;
+   tsprite.y = 50;
    infoPlane.attach( tsprite );
 */
 });
