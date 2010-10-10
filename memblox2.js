@@ -226,22 +226,26 @@ Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-                var hit;
-                var dir;
-                if (Effect.Game.isKeyDown("right")) {
-                  hit = this.move( this.width, 0 );
-                  dir = -1;
-                }else if(Effect.Game.isKeyDown("left")){
-                  hit = this.move( -this.width, 0 );
-                  dir = 1;
-                }else if(Effect.Game.isKeyDown("down")){
-                  this.y += 10;
-                }
+        var hit;
+        var dir;
+        if (clock % 3 == 0) { // only update key presses every so many tics
+            if (Effect.Game.isKeyDown("right")) {
+                hit = this.move( this.width, 0 );
+                dir = -1;
+            }else if(Effect.Game.isKeyDown("left")){
+                hit = this.move( -this.width, 0 );
+                dir = 1;
+            }//else if(Effect.Game.isKeyDown("down")){
+             //   this.y += 10;
+            //}
+        }
+        if(Effect.Game.isKeyDown("down")){
+            this.y += 10;
+        }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
 			this.x = this.x + (this.width * dir) ;
 		}
-		this.xd = 0;
                 var hit = this.move( 0, 1 * memblox.environment.currentLevel );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
@@ -253,6 +257,8 @@ Block.add({
                           memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
                         this.state = 'stuck';
+                        if (this.y > GAME_LOWER_BOUNDARY - this.height)
+                            this.y = GAME_LOWER_BOUNDARY - this.height;
                 }
 	}
 });
