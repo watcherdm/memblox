@@ -100,19 +100,31 @@ var memblox = (function(window, document, undefined) {
       activeblock : null
     },
     start_new_game: function() {
-        // start new game (from title screen)
-        var port = Effect.Port;
-        var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
-
-        //memblox.spriteGroups = {};
-        
-        Effect.Audio.quiet();
-        
-        Effect.Game.clearSchedule();
-        Effect.Game.removeAllTweens();
-        Effect.Port.removeAll();
-        Effect.Port.setBackgroundColor('black');
-	
+		// start new game (from title screen)
+		var port = Effect.Port;
+		
+		//memblox.spriteGroups = {};
+		
+		Effect.Audio.quiet();
+		Effect.Game.clearSchedule();
+		Effect.Game.removeAllTweens();
+		Effect.Port.removeAll();
+		Effect.Port.setBackgroundColor('black');
+        memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5,
+            memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
+        memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 3, 3, "Score:", null);
+        memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes
+            [memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
+        var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes
+            [memblox.environment.theme] + "/bg-music.mp3");
+        Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
+            var splane = Effect.Port.getPlane("Blocks");
+            var sprite = splane.lookupSpriteFromGlobal(pt);
+            if(sprite){
+                sprite.flip(splane);
+            }
+        });	
         Effect.Game.loadLevel( 'Default', function(){
             var bplane = Effect.Port.getPlane("Background");
             var backsprite = bplane.createSprite("Background");
@@ -222,22 +234,26 @@ Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-                var hit;
-                var dir;
-                if (Effect.Game.isKeyDown("right")) {
-                  hit = this.move( this.width, 0 );
-                  dir = -1;
-                }else if(Effect.Game.isKeyDown("left")){
-                  hit = this.move( -this.width, 0 );
-                  dir = 1;
-                }else if(Effect.Game.isKeyDown("down")){
-                  this.y += 10;
-                }
+        var hit;
+        var dir;
+        if (clock % 3 == 0) { // only update key presses every so many tics
+            if (Effect.Game.isKeyDown("right")) {
+                hit = this.move( this.width, 0 );
+                dir = -1;
+            }else if(Effect.Game.isKeyDown("left")){
+                hit = this.move( -this.width, 0 );
+                dir = 1;
+            }//else if(Effect.Game.isKeyDown("down")){
+             //   this.y += 10;
+            //}
+        }
+        if(Effect.Game.isKeyDown("down")){
+            this.y += 10;
+        }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
 			this.x = this.x + (this.width * dir) ;
 		}
-		this.xd = 0;
                 var hit = this.move( 0, 1 * memblox.environment.currentLevel );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
@@ -249,6 +265,8 @@ Block.add({
                           memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
                         this.state = 'stuck';
+                        if (this.y > GAME_LOWER_BOUNDARY - this.height)
+                            this.y = GAME_LOWER_BOUNDARY - this.height;
                 }
 	}
 });
@@ -304,17 +322,6 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
-  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
-  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
-  
-  Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
-    var splane = Effect.Port.getPlane("Blocks");
-    var sprite = splane.lookupSpriteFromGlobal(pt);
-    if(sprite){
-      sprite.flip(splane);
-    }
-  });
   Effect.Game.loadLevel( 'TitleScreen', function(){
   		// title screen is now loaded
 		Effect.Game.clearSchedule();
@@ -343,8 +350,8 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 			mode: 'EaseOut',
 			algorithm: 'Quintic',
 			properties: {
-				x: { start: 340, end: 50 },
-				y: { start: 600, end: 425 }
+				x: { start: 340, end: 70 },
+				y: { start: 600, end: 350 }
 			}
 		}).captureMouse();
 
