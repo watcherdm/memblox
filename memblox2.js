@@ -47,36 +47,23 @@ var memblox = (function(window, document, undefined) {
 
   // EventTarget class acts as base for custom events
   var memblox = {
-    pause : false,
     objects : {
       blocks : [],
       makeHud : makeHud
     },
     options : {
-      soundEnabled: true,
-      bufferMin: 3,
-      bufferMax: 10,
       pSize:40,
       boardHeight: 480,
       boardWidth: 320,
-      numberOfMatches: 16,
     },
     io : {
       messageDisplay: {},
       scoreDisplay: {},
       levelDisplay: {}
     },
-    actions: {
-      flipBlock : function(block){/**/return;},
-      moveBlock : function(block, direction){/**/return;},
-    },
     events: {
-      blockCleared : function(block){/**/return;},
-      blockMoved : function(block, direction){/**/return;},
-      blockFell : function(block, spaces){/**/return;},
-      blockFlipped : function(block){/**/return;},
       levelCleared : function(obj, level){
-        if((level + 1) >= obj.environment.level.length){
+        if((level + 1) >= 8){
           obj.environment.currentLevel = 1;
         };
         obj.environment.currentLevel = level + 1;
@@ -85,7 +72,6 @@ var memblox = (function(window, document, undefined) {
       }
     },
     environment: {
-      board : [],
       player : "",
       score : 0,
       currentLevel :1,
