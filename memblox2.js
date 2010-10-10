@@ -217,7 +217,9 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     if(sprite){
       if(memblox.environment.flipped.blocks.length == 1){
         if (sprite.matchNumber == memblox.environment.flipped.blocks[0].matchNumber && sprite !== memblox.environment.flipped.blocks[0]){
-          console.log(sprite.id);
+          splane.deleteSprite(sprite.id);
+          splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
+          splane.createSprite("Block", {x: 120, y: -40});
           // add drop state physics
         }
         memblox.environment.flipped.blocks = [];
@@ -233,17 +235,11 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     splane.draw();
     music.playSound();
   });
-     var hud = new HUD( 'myhud' );
+  var hud = new HUD( 'myhud' );
    hud.setFont( 'Optimer18Test' );
    hud.setTableSize( 15, 4 );  // This sets the total number of characters allowed horizontally and vertically
    hud.setTracking( .8, 1.0 );  // Spacing between letters horiz and vert, where 1.0 means normal, 0.5 means more squeezed together, and 1.5 means more spaced apart
    hud.setPosition( 40, 50 );
    hud.setZIndex( 3 );
    Effect.Port.attach( hud );
-
-  hud.setString( 0, 0, "Game HUD" );
-  hud.setString( 0, 1, "Second Line" );
-  hud.setString( 0, 2, "Third Line" );
-  hud.setString( 0, 3, "1234567890123456" );
-
 });
