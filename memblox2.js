@@ -102,6 +102,35 @@ var memblox = (function(window, document, undefined) {
       themes : ["default","mario"],
       activeblock : null
     },
+    start_new_game: function() {
+		// start new game (from title screen)
+		var port = Effect.Port;
+		
+		//memblox.spriteGroups = {};
+		
+		Effect.Audio.quiet();
+		
+		Effect.Game.clearSchedule();
+		Effect.Game.removeAllTweens();
+		Effect.Port.removeAll();
+		Effect.Port.setBackgroundColor('black');
+	
+        Effect.Game.loadLevel( 'Default', function(){
+            var bplane = Effect.Port.getPlane("Background");
+            var backsprite = bplane.createSprite("Background");
+            splane = Effect.Port.getPlane("Blocks");
+            splane.createSprite("Block",{x:120, y:-40});
+            splane.draw();
+            music.playSound();
+        });
+        Effect.Game.addEventListener( 'onLogic', function(clock){
+            if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
+                memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
+            }
+            memblox.io.levelDisplay.write(memblox.environment.currentLevel);
+            memblox.io.scoreDisplay.write(memblox.environment.score);
+        });
+	}, // start_new_game
     data : (function(){
       var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
       var msg = [];
@@ -284,19 +313,39 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
       sprite.flip(splane);
     }
   });
-  Effect.Game.loadLevel( 'Default', function(){
-    var bplane = Effect.Port.getPlane("Background");
-    var backsprite = bplane.createSprite("Background");
-    splane = Effect.Port.getPlane("Blocks");
-    splane.createSprite("Block",{x:120, y:-40});
-    splane.draw();
-    music.playSound();
-  });
-  Effect.Game.addEventListener( 'onLogic', function(clock){
-    if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
-      memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
-    }
-    memblox.io.levelDisplay.write(memblox.environment.currentLevel);
-    memblox.io.scoreDisplay.write(memblox.environment.score);
-  })
+  Effect.Game.loadLevel( 'TitleScreen', function(){
+  		// title screen is now loaded
+		Effect.Game.clearSchedule();
+		Effect.Game.setState( 'title' );
+		Effect.Port.setScroll( 0, 0 );
+		var splane = Effect.Port.getPlane('TitleSprites');
+		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 130, y: -150, zIndex: 3 } ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				y: { start: -150, end: 40 }
+			}
+		});
+        // hook mouse events for the buttons
+		splane.createSprite( 'TitleButton', {
+			url: '/images/sprites/title/startGameBtn.png',
+			x: 340,
+			y: 600,
+			zIndex: 4,
+			onMouseUp: function() { memblox.start_new_game(); }
+		} ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				x: { start: 340, end: 50 },
+				y: { start: 600, end: 425 }
+			}
+		}).captureMouse();
+
+  };
+
 });
