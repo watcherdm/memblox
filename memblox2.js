@@ -78,11 +78,11 @@ var memblox = (function(window, document, undefined) {
       changeTheme : function(obj, theme_number){
         if(theme_number < obj.environment.themes.length){
           obj.environment.theme = theme_number;
-          var bplane = Effect.Game.getPlane("Background");
+          var bplane = Effect.Port.getPlane("Background");
           var bsprite = bplane.findSprite({type:"Background"});
           bsprite.setImage('/images/backgrounds/' + obj.environment.themes[obj.environment.theme] + '/bg1.jpg');
           // background set
-          var splane = Effect.Game.getPlane("Blocks");
+          var splane = Effect.Port.getPlane("Blocks");
           var blocks = splane.findSprites({type: "Block"});
           for(var i = 0, block; block = blocks[i++];){
             block.setImage("/images/sprites/" + obj.environment.themes[obj.environment.theme] + "/" + block.matchNumber + ".png");
