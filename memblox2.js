@@ -92,17 +92,18 @@ var memblox = (function(window, document, undefined) {
       activeblock : null
     },
     start_new_game: function() {
-		// start new game (from title screen)
-		var port = Effect.Port;
-		
-		//memblox.spriteGroups = {};
-		
-		Effect.Audio.quiet();
-		
-		Effect.Game.clearSchedule();
-		Effect.Game.removeAllTweens();
-		Effect.Port.removeAll();
-		Effect.Port.setBackgroundColor('black');
+        // start new game (from title screen)
+        var port = Effect.Port;
+        var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
+
+        //memblox.spriteGroups = {};
+        
+        Effect.Audio.quiet();
+        
+        Effect.Game.clearSchedule();
+        Effect.Game.removeAllTweens();
+        Effect.Port.removeAll();
+        Effect.Port.setBackgroundColor('black');
 	
         Effect.Game.loadLevel( 'Default', function(){
             var bplane = Effect.Port.getPlane("Background");
@@ -169,6 +170,7 @@ var FAST_FALL_DELAY = 0.05;
 function randomInt(low, high){
   return Math.floor(Math.random() * (high - (low - 1))) + low;
 }
+Sprite.extend("TitleButton",{ url: '/images/sprites/title/startGameBtn.png'});
 Sprite.extend('Background',{ url: '/images/backgrounds/' + memblox.environment.themes[memblox.environment.theme] + '/bg1.jpg',
   width: memblox.options.boardWidth,
   height: memblox.options.boardHeight,
@@ -297,8 +299,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
   memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
   memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
   memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
-  var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
-
+  
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
     var splane = Effect.Port.getPlane("Blocks");
     var sprite = splane.lookupSpriteFromGlobal(pt);
@@ -312,7 +313,7 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 		Effect.Game.setState( 'title' );
 		Effect.Port.setScroll( 0, 0 );
 		var splane = Effect.Port.getPlane('TitleSprites');
-		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 130, y: -150, zIndex: 3 } ).tween({
+		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 0, y: -150, zIndex: 3 } ).tween({
 			delay: 0,
 			duration: 180,
 			mode: 'EaseOut',
@@ -339,6 +340,6 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
 			}
 		}).captureMouse();
 
-  };
+  });
 
 });
