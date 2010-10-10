@@ -5,7 +5,6 @@ var memblox = (function(window, document, undefined) {
   }
   // makeHud method for creating new Heads up display
   function makeHud(id, cols, rows, font, x, y, prefix, suffix){
-
    var thishud = (function(Port, id, cols, rows, font, x, y, prefix, suffix){
       var hud = new HUD(id);
       var lastmsg = "";
@@ -50,7 +49,8 @@ var memblox = (function(window, document, undefined) {
   var memblox = {
     pause : false,
     objects : {
-      blocks : []
+      blocks : [],
+      makeHud : makeHud
     },
     options : {
       soundEnabled: true,
@@ -75,10 +75,14 @@ var memblox = (function(window, document, undefined) {
       blockMoved : function(block, direction){/**/return;},
       blockFell : function(block, spaces){/**/return;},
       blockFlipped : function(block){/**/return;},
-      levelCleared : function(level){
-        this.currentLevel = level + 1;
-        this.matchSetSize = (level + 1) * 2;
-        return;}
+      levelCleared : function(obj, level){
+        if((level + 1) == obj.environment.level.length){
+          obj.
+        };
+        obj.environment.currentLevel = level + 1;
+        obj.environment.matchSetSize = (level + 1) * 2;
+        obj.environment.matchCount = 0;
+      }
     },
     environment: {
       board : [],
@@ -194,6 +198,8 @@ Block.add({
                 }else if(Effect.Game.isKeyDown("left")){
                   hit = this.move( -this.width, 0 );
                   dir = 1;
+                }else if(Effect.Game.isKeyDown("down")){
+                  this.y += 10;
                 }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
@@ -251,7 +257,9 @@ Block.add({
           }// otherwise just use the active block that is already there, the match was done on the ground
           splane.deleteSprite(this.id);
           splane.deleteSprite(memblox.environment.flipped.blocks[0].id);
+          memblox.environment.matchCount += 1;
           memblox.environment.score += 20 * memblox.environment.currentLevel;
+          console.log(memblox.environment.matchCount);
         }
         memblox.environment.flipped.blocks[0].unflipping = true;
         this.unflipping = true;
@@ -264,9 +272,9 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme], 50, 3, null, null);
-  memblox.io.scoreDisplay = makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme], 3, 3, "Score: ", null);
-  memblox.io.levelDisplay = makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme], 176, 3, "Level: ", null);
+  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
+  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score: ", null);
+  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Level: ", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
 
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
@@ -285,7 +293,10 @@ Effect.Game.addEventListener( 'onLoadGame',function(){
     music.playSound();
   });
   Effect.Game.addEventListener( 'onLogic', function(clock){
-    
+    if(memblox.environment.matchCount > memblox.environment.currentLevel * 10){
+      memblox.events.levelCleared(memblox, memblox.environment.currentLevel);
+    }
+    memblox.io.levelDisplay.write(memblox.environment.currentLevel);
     memblox.io.scoreDisplay.write(memblox.environment.score);
   })
 });
