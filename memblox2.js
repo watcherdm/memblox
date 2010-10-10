@@ -1,9 +1,9 @@
 var BLOCK_HEIGHT = 40;
 var BLOCK_WIDTH  = 40;
-var GAME_LEFT_BOUNDARY = 5;
-var GAME_RIGHT_BOUNDARY = GAME_LEFT_BOUNDARY + (BLOCK_WIDTH*10);
-var GAME_UPPER_BOUNDARY = 5;
-var GAME_LOWER_BOUNDARY = GAME_UPPER_BOUNDARY + (BLOCK_HEIGHT*20);
+var GAME_LEFT_BOUNDARY = 0;
+var GAME_RIGHT_BOUNDARY = GAME_LEFT_BOUNDARY + (BLOCK_WIDTH*8);
+var GAME_UPPER_BOUNDARY = 0;
+var GAME_LOWER_BOUNDARY = GAME_UPPER_BOUNDARY + (BLOCK_HEIGHT*12);
 
 // These are the delays in secs. between block movements for each level
 // index 0 is the delay for level 1, etc.
@@ -57,10 +57,12 @@ Block.add({
 		// now move the sprite vertically
 		//
                 console.log(this.y);
-                var hit = this.move( 0, this.height );
+                var hit = this.move( 0, 1 );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
-                        this.y -= this.height;
+                        this.y--;                
+                        var splane = Effect.Port.getPlane("Blocks");
+                        splane.createSprite("Block",{x: 160, y:0});
                         this.state = 'stuck';
                 }
 	}
