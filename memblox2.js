@@ -1,3 +1,4 @@
+var speed = 4;
 var BLOCK_HEIGHT = 40;
 var BLOCK_WIDTH  = 40;
 var GAME_LEFT_BOUNDARY = 0;
@@ -54,12 +55,16 @@ Block.add({
 		
 		// now move the sprite vertically
 		//
-                var hit = this.move( 0, 1 );
+                var hit = this.move( 0, 1 * speed );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
                         this.y--;                
                         var splane = Effect.Port.getPlane("Blocks");
-                        splane.createSprite("Block",{	url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',x: 160, y:0});
+                        if(this.y >= 0){
+                          splane.createSprite("Block",{url: '/images/sprites/mario/' + randomInt(1, 8) + '.png',x: 160, y:-40});
+                        }else{
+                          alert("GAME OVER SUCKA!");
+                        }
                         this.state = 'stuck';
                 }
 	}
