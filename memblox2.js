@@ -99,7 +99,45 @@ var memblox = (function(window, document, undefined) {
       themes : ["default","mario"],
       activeblock : null
     },
-    start_new_game: function() {
+    doTitleScreen: function() {
+  		// title screen is now loaded
+		Effect.Game.clearSchedule();
+		Effect.Game.setState( 'title' );
+		Effect.Port.setScroll( 0, 0 );
+		var splane = Effect.Port.getPlane('TitleSprites');
+		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 0, y: -150, zIndex: 3 } ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				y: { start: -150, end: 40 }
+			}
+		});
+        // hook mouse events for the buttons
+		splane.createSprite( 'TitleButton', {
+			url: '/images/sprites/title/startGameBtn.png',
+			x: 340,
+			y: 600,
+			zIndex: 4,
+			onMouseUp: function() { memblox.startNewGame(); }
+		} ).tween({
+			delay: 0,
+			duration: 180,
+			mode: 'EaseOut',
+			algorithm: 'Quintic',
+			properties: {
+				x: { start: 340, end: 70 },
+				y: { start: 600, end: 350 }
+			}
+		}).captureMouse();
+        var themeNames = "Available Themes:\n"
+        for (i=0; i < memblox.environment.themes.length; i++) {
+            themeNames += memblox.environment.themes[i] + "\n";
+        }
+        alert(themeNames);        
+    }, // doTitleScreen
+    startNewGame: function() {
 		// start new game (from title screen)
 		var port = Effect.Port;
 		
@@ -109,7 +147,7 @@ var memblox = (function(window, document, undefined) {
 		Effect.Game.clearSchedule();
 		Effect.Game.removeAllTweens();
 		Effect.Port.removeAll();
-		Effect.Port.setBackgroundColor('black');
+		//Effect.Port.setBackgroundColor('black');
         memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5,
             memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
         memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes
@@ -140,7 +178,7 @@ var memblox = (function(window, document, undefined) {
             memblox.io.levelDisplay.write(memblox.environment.currentLevel);
             memblox.io.scoreDisplay.write(memblox.environment.score);
         });
-	}, // start_new_game
+	}, // startNewGame
     data : (function(){
       if(openDatabase){
         var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
@@ -321,40 +359,7 @@ Block.add({
       console.log(this.matchNumber);
     }
 });
-Effect.Game.addEventListener( 'onLoadGame',function(){
-  Effect.Game.loadLevel( 'TitleScreen', function(){
-  		// title screen is now loaded
-		Effect.Game.clearSchedule();
-		Effect.Game.setState( 'title' );
-		Effect.Port.setScroll( 0, 0 );
-		var splane = Effect.Port.getPlane('TitleSprites');
-		splane.createSprite( StaticImageSprite, { url: '/images/sprites/title/scubed.png', x: 0, y: -150, zIndex: 3 } ).tween({
-			delay: 0,
-			duration: 180,
-			mode: 'EaseOut',
-			algorithm: 'Quintic',
-			properties: {
-				y: { start: -150, end: 40 }
-			}
-		});
-        // hook mouse events for the buttons
-		splane.createSprite( 'TitleButton', {
-			url: '/images/sprites/title/startGameBtn.png',
-			x: 340,
-			y: 600,
-			zIndex: 4,
-			onMouseUp: function() { memblox.start_new_game(); }
-		} ).tween({
-			delay: 0,
-			duration: 180,
-			mode: 'EaseOut',
-			algorithm: 'Quintic',
-			properties: {
-				x: { start: 340, end: 70 },
-				y: { start: 600, end: 350 }
-			}
-		}).captureMouse();
-
-  });
-
+    Effect.Game.addEventListener( 'onLoadGame',function(){
+        Effect.Game.loadLevel( 'TitleScreen', memblox.doTitleScreen );
+  
 });
