@@ -47,45 +47,34 @@ var memblox = (function(window, document, undefined) {
 
   // EventTarget class acts as base for custom events
   var memblox = {
-    pause : false,
     objects : {
       blocks : [],
       makeHud : makeHud
     },
     options : {
-      soundEnabled: true,
-      bufferMin: 3,
-      bufferMax: 10,
       pSize:40,
       boardHeight: 480,
       boardWidth: 320,
-      numberOfMatches: 16,
     },
     io : {
       messageDisplay: {},
       scoreDisplay: {},
       levelDisplay: {}
     },
-    actions: {
-      flipBlock : function(block){/**/return;},
-      moveBlock : function(block, direction){/**/return;},
-    },
     events: {
-      blockCleared : function(block){/**/return;},
-      blockMoved : function(block, direction){/**/return;},
-      blockFell : function(block, spaces){/**/return;},
-      blockFlipped : function(block){/**/return;},
       levelCleared : function(obj, level){
-        if((level + 1) >= obj.environment.level.length){
+        if((level + 1) >= 8){
           obj.environment.currentLevel = 1;
         };
         obj.environment.currentLevel = level + 1;
         obj.environment.matchSetSize = (level + 1) * 2;
         obj.environment.matchCount = 0;
+      },
+      gameOver : function(obj){
+        obj.active = false;
       }
     },
     environment: {
-      board : [],
       player : "",
       score : 0,
       currentLevel :1,
@@ -98,7 +87,7 @@ var memblox = (function(window, document, undefined) {
       matchCount : 0,
       topScores : [],
       players : [],
-      theme : 1,
+      theme : 0,
       themes : ["default","mario"],
       activeblock : null
     },
@@ -132,27 +121,31 @@ var memblox = (function(window, document, undefined) {
         });
 	}, // start_new_game
     data : (function(){
-      var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
-      var msg = [];
-      var addScore = function(player, score){
-        db.transaction(function(tx){
-          tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
-          [player, score],
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);})
-        })
-      };
-      var highScores = function(){
-        db.transaction(function(tx){
-          tx.executeSql("SELECT * FROM scubed ORDER BY score"),
-          function(tx, data){msg.push(data);},
-          function(tx, e){msg.push(e);}
-        })
-      };
-      return {
-        addScore : addScore,
-        highScores: highScores,
-        msg: msg
+      if(openDatabase){
+        var db = openDatabase("scubed", "1.0", "Scubed High Scores", "1024");
+        var msg = [];
+        var addScore = function(player, score){
+          db.transaction(function(tx){
+            tx.executeSql("INSERT INTO scubed (player, score) VALUES (?,?)", 
+            [player, score],
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);})
+          })
+        };
+        var highScores = function(){
+          db.transaction(function(tx){
+            tx.executeSql("SELECT * FROM scubed ORDER BY score"),
+            function(tx, data){msg.push(data);},
+            function(tx, e){msg.push(e);}
+          })
+        };
+        return {
+          addScore : addScore,
+          highScores: highScores,
+          msg: msg
+        }
+      }else{
+        return {};
       }
     })(),
   }
@@ -301,9 +294,9 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
-  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 10, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score: ", null);
-  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 8, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Level: ", null);
+  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
+  memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
+  memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
 
   Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
