@@ -87,7 +87,7 @@ var memblox = (function(window, document, undefined) {
       matchCount : 0,
       topScores : [],
       players : [],
-      theme : 1,
+      theme : 0,
       themes : ["default","mario"],
       activeblock : null
     },
@@ -265,7 +265,7 @@ Block.add({
     }
 });
 Effect.Game.addEventListener( 'onLoadGame',function(){
-  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 50, 3, null, null);
+  memblox.io.messageDisplay = memblox.objects.makeHud("message", 20, 5, memblox.environment.themes[memblox.environment.theme] + "Font", 20, 100, null, null);
   memblox.io.scoreDisplay =  memblox.objects.makeHud("score", 13, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 3, 3, "Score:", null);
   memblox.io.levelDisplay =  memblox.objects.makeHud("level", 5, 1, memblox.environment.themes[memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
   var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes[memblox.environment.theme] + "/bg-music.mp3");
