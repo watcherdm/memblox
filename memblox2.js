@@ -78,7 +78,15 @@ var memblox = (function(window, document, undefined) {
       changeTheme : function(obj, theme_number){
         if(theme_number < obj.environment.themes.length){
           obj.environment.theme = theme_number;
-          //var bpanel = Effect.Game.g
+          var bplane = Effect.Port.getPlane("Background");
+          var bsprite = bplane.findSprite({type:"Background"});
+          bsprite.setImage('/images/backgrounds/' + obj.environment.themes[obj.environment.theme] + '/bg1.jpg');
+          // background set
+          var splane = Effect.Port.getPlane("Blocks");
+          var blocks = splane.findSprites({type: "Block"});
+          for(var i = 0, block; block = blocks[i++];){
+            block.setImage("/images/sprites/" + obj.environment.themes[obj.environment.theme] + "/" + block.matchNumber + ".png");
+          }
         }
       }
     },
@@ -272,26 +280,22 @@ Block.add({
 	falling: function(clock) {
 		// now move the sprite, horizontal only first
 		//
-        var hit;
-        var dir;
-        if (clock % 3 == 0) { // only update key presses every so many tics
-            if (Effect.Game.isKeyDown("right")) {
-                hit = this.move( this.width, 0 );
-                dir = -1;
-            }else if(Effect.Game.isKeyDown("left")){
-                hit = this.move( -this.width, 0 );
-                dir = 1;
-            }//else if(Effect.Game.isKeyDown("down")){
-             //   this.y += 10;
-            //}
-        }
-        if(Effect.Game.isKeyDown("down")){
-            this.y += 10;
-        }
+                var hit;
+                var dir;
+                if (Effect.Game.isKeyDown("right")) {
+                  hit = this.move( this.width, 0 );
+                  dir = -1;
+                }else if(Effect.Game.isKeyDown("left")){
+                  hit = this.move( -this.width, 0 );
+                  dir = 1;
+                }else if(Effect.Game.isKeyDown("down")){
+                  this.y += 10;
+                }
 		if (this.didCollideX(hit)) {
 		    	this.bumpedSide = true;
 			this.x = this.x + (this.width * dir) ;
 		}
+		this.xd = 0;
                 var hit = this.move( 0, 1 * memblox.environment.currentLevel );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
@@ -303,8 +307,6 @@ Block.add({
                           memblox.io.messageDisplay.write("GAME OVER SUCKA!");
                         }
                         this.state = 'stuck';
-                        if (this.y > GAME_LOWER_BOUNDARY - this.height)
-                            this.y = GAME_LOWER_BOUNDARY - this.height;
                 }
 	}
 });
@@ -360,6 +362,5 @@ Block.add({
     }
 });
     Effect.Game.addEventListener( 'onLoadGame',function(){
-        Effect.Game.loadLevel( 'TitleScreen', memblox.doTitleScreen );
-  
+        Effect.Game.loadLevel( 'TitleScreen', memblox.doTitleScreen );  
 });
