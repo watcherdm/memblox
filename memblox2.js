@@ -1,5 +1,25 @@
-
-
+Sprite.extend('Block',{
+  url: "/images/sprites/color_01.png",
+  setup: function(){
+    this.active = true;
+    this.y = 0;
+  },
+  logic : function(){
+      if(this.active){
+        this.y ++;
+      }
+      if(this.left){
+        this.x = this.x - 40;
+      }
+      else if (this.right){
+        this.x = this.x + 40;
+      }
+      if (this.flip) {
+        this.doFlip();
+        this.flip = false;
+      }
+  }
+});  
 (function(window, document, undefined) {
   if(!window.console || !console.log){
     console = {};
@@ -15,7 +35,7 @@
   // EventTarget class acts as base for custom events
   var memblox = {
     pause : false,
-    init : function(Effect){
+    init : function(){
       var splane = new SpritePlane( 'Blocks' );
       splane.setZIndex( 2 );
       var music = Effect.Audio.getTrack("/audio/music/mario/bg-music.mp3");
@@ -29,6 +49,9 @@
         // there needs to be useful
         alert( "You clicked " + pt.x + " by " + pt.y );
       });
+      Effect.Game.loadLevel( 'Default', function(){
+        music.playSound();
+      });
     },
     objects : {
       block : function(theme){
@@ -39,19 +62,7 @@
             // this needs to establish the tile
           },
           logic: function(clock){
-            if(this.active){
-              this.y ++;
-            }
-            if(this.left){
-              this.x = this.x - 40;
-            }
-            else if (this.right){
-              this.x = this.x + 40;
-            }
-            if (this.flip) {
-              this.doFlip();
-              this.flip = false;
-            }
+          
           }
         });
         Effect.Game.addEventListener( 'onKeyDown', function(id){
@@ -147,4 +158,4 @@
   }
   window.memblox = memblox;
 })(window, window.document)
-Effect.Game.addEventListener( 'onLoadGame',function(){memblox.init(Effect);})
+Effect.Game.addEventListener( 'onLoadGame',memblox.init)
