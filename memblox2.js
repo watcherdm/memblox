@@ -143,7 +143,7 @@ var memblox = (function(window, document, undefined) {
         for (i=0; i < memblox.environment.themes.length; i++) {
             themeNames += memblox.environment.themes[i] + "\n";
         }
-        alert(themeNames);        
+        //alert(themeNames);        
     }, // doTitleScreen
     startNewGame: function() {
 		// start new game (from title screen)
@@ -304,7 +304,7 @@ Block.add({
                 var hit = this.move( 0, 1 * memblox.environment.currentLevel );
                 if (this.didCollideY(hit)) {
                         // if we hit something solid, stop our vert movement
-                        this.y = this.y - (1 * memblox.environment.currentLevel);             
+                        //this.y = this.y - (1 * memblox.environment.currentLevel);             
                         var splane = Effect.Port.getPlane("Blocks");
                         if(this.y >= 0){
                           memblox.environment.activeblock = splane.createSprite("Block",{x: 120, y:-40});
