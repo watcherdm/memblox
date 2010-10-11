@@ -72,12 +72,28 @@ var memblox = (function(window, document, undefined) {
       },
       gameOver : function(obj){
         obj.active = false;
+        obj.io.messageDisplay.write("Game Over!");
+        var splane = Effect.Port.getPlane("Blocks");
+        var bplane = Effect.Port.getPlane("Background");
+        splane.setLogic(false);
+        bplane.createSprite("TitleButton",{x: 40, y:200});
       }
     },
     actions : {
       changeTheme : function(obj, theme_number){
         if(theme_number < obj.environment.themes.length){
           obj.environment.theme = theme_number;
+          var bplane = Effect.Port.getPlane("Background");
+          var bsprite = bplane.findSprite({type:"Background"});
+          bsprite.setImage('/images/backgrounds/' + obj.environment.themes[obj.environment.theme] + '/bg1.jpg');
+          // background set
+          var splane = Effect.Port.getPlane("Blocks");
+          var blocks = splane.findSprites({type: "Block"});
+          for(var i = 0, block; block = blocks[i++];){
+            block.setImage("/images/sprites/" + obj.environment.themes[obj.environment.theme] + "/" + block.matchNumber + ".png");
+          }
+        }else{
+          obj.environment.theme = 0;
           var bplane = Effect.Port.getPlane("Background");
           var bsprite = bplane.findSprite({type:"Background"});
           bsprite.setImage('/images/backgrounds/' + obj.environment.themes[obj.environment.theme] + '/bg1.jpg');
@@ -103,8 +119,8 @@ var memblox = (function(window, document, undefined) {
       matchCount : 0,
       topScores : [],
       players : [],
-      theme : 1,
-      themes : ["default","mario"],
+      theme : 0,
+      themes : ["default","mario","unicorn"],
       activeblock : null
     },
     doTitleScreen: function() {
@@ -164,6 +180,15 @@ var memblox = (function(window, document, undefined) {
             [memblox.environment.theme] + "Font", 176, 3, "Lvl:", null);
         var music = Effect.Audio.getTrack("/audio/music/" + memblox.environment.themes
             [memblox.environment.theme] + "/bg-music.mp3");
+        Effect.Game.setKeyHandler("change_theme", (function(){
+          return {
+            onKeyUp: function(ev){
+              console.log(memblox);
+              memblox.actions.changeTheme(memblox , memblox.environment.theme + 1);
+            }
+          }
+        })());
+
         Effect.Port.addEventListener( 'onMouseDown', function(pt, buttonIdx){
             var splane = Effect.Port.getPlane("Blocks");
             var sprite = splane.lookupSpriteFromGlobal(pt);
@@ -309,7 +334,7 @@ Block.add({
                         if(this.y >= 0){
                           memblox.environment.activeblock = splane.createSprite("Block",{x: 120, y:-40});
                         }else{
-                          memblox.io.messageDisplay.write("GAME OVER SUCKA!");
+                          memblox.events.gameOver(memblox);
                         }
                         var offsetY = this.y % BLOCK_HEIGHT;
                         if (offsetY > 0) {
@@ -374,6 +399,6 @@ Block.add({
       console.log(this.matchNumber);
     }
 });
-    Effect.Game.addEventListener( 'onLoadGame',function(){
+Effect.Game.addEventListener( 'onLoadGame',function(){
         Effect.Game.loadLevel( 'TitleScreen', memblox.doTitleScreen );  
 });
